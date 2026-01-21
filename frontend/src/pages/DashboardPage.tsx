@@ -19,6 +19,8 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const userData = authService.getUser();
+      console.log('User data:', userData);
+      console.log('User apps:', userData?.apps);
       setUser(userData);
 
       const response = await apiService.getMyApps();
@@ -58,7 +60,7 @@ export default function DashboardPage() {
 
   const getAppIcon = (appCode: string) => {
     const icons: Record<string, string> = {
-      'amazon-sell-metrics': '/icons/amazon.svg',
+      'amzsellmetrics': '/icons/amazon.svg',
       'stockpulse': '/icons/stockpulse.svg',
       'pricelab': '/icons/pricelab.svg',
       'manumaestro': '/icons/manumaestro.svg',
@@ -72,6 +74,7 @@ export default function DashboardPage() {
   };
 
   const isAdmin = user?.apps && Object.values(user.apps).some(role => role === 'admin');
+  console.log('isAdmin:', isAdmin);
 
   if (loading) {
     return (
