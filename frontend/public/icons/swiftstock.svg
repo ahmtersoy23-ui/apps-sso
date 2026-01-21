@@ -7,18 +7,15 @@
     </linearGradient>
   </defs>
 
-  <!-- Rounded background -->
-  <rect width="100" height="100" rx="22" fill="url(#bg)"/>
-
   <!-- Simple geometric "S" shape made of boxes -->
   <!-- Top box -->
-  <rect x="30" y="25" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
+  <rect x="30" y="25" width="25" height="12" rx="2" fill="url(#bg)" opacity="0.95"/>
 
   <!-- Middle connecting box -->
-  <rect x="37" y="40" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
+  <rect x="37" y="40" width="25" height="12" rx="2" fill="url(#bg)" opacity="0.95"/>
 
   <!-- Bottom box -->
-  <rect x="45" y="55" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
+  <rect x="45" y="55" width="25" height="12" rx="2" fill="url(#bg)" opacity="0.95"/>
 
   <!-- Accent element - swift motion lines -->
   <line x1="58" y1="31" x2="68" y2="31" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" opacity="0.8"/>

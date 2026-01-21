@@ -10,42 +10,36 @@
     </linearGradient>
   </defs>
 
-  <!-- Background Circle -->
-  <circle cx="100" cy="100" r="95" fill="url(#primaryGradient)"/>
-
   <!-- Large M letter - Modern geometric style -->
   <g transform="translate(100, 100)">
     <!-- Left vertical bar -->
-    <rect x="-45" y="-50" width="12" height="100" fill="white" rx="3"/>
+    <rect x="-45" y="-50" width="12" height="100" fill="url(#primaryGradient)" rx="3"/>
 
     <!-- Right vertical bar -->
-    <rect x="33" y="-50" width="12" height="100" fill="white" rx="3"/>
+    <rect x="33" y="-50" width="12" height="100" fill="url(#primaryGradient)" rx="3"/>
 
     <!-- Left diagonal -->
-    <rect x="-33" y="-50" width="12" height="60" fill="white" rx="3"
+    <rect x="-33" y="-50" width="12" height="60" fill="url(#primaryGradient)" rx="3"
           transform="rotate(25 -27 -50)"/>
 
     <!-- Right diagonal -->
-    <rect x="21" y="-50" width="12" height="60" fill="white" rx="3"
+    <rect x="21" y="-50" width="12" height="60" fill="url(#primaryGradient)" rx="3"
           transform="rotate(-25 27 -50)"/>
   </g>
 
   <!-- Conductor's baton - elegant diagonal line -->
   <g>
     <line x1="140" y1="140" x2="175" y2="175"
-          stroke="white" stroke-width="8"
+          stroke="url(#accentGradient)" stroke-width="8"
           stroke-linecap="round" opacity="0.95"/>
-    <circle cx="175" cy="175" r="6" fill="white" opacity="0.95"/>
+    <circle cx="175" cy="175" r="6" fill="url(#accentGradient)" opacity="0.95"/>
     <circle cx="140" cy="140" r="4" fill="url(#accentGradient)" opacity="0.9"/>
   </g>
 
   <!-- Three musical note dots - representing orchestration -->
   <g>
-    <circle cx="35" cy="165" r="5" fill="white" opacity="0.85"/>
-    <circle cx="50" cy="165" r="5" fill="white" opacity="0.85"/>
-    <circle cx="65" cy="165" r="5" fill="white" opacity="0.85"/>
+    <circle cx="35" cy="165" r="5" fill="url(#accentGradient)" opacity="0.85"/>
+    <circle cx="50" cy="165" r="5" fill="url(#accentGradient)" opacity="0.85"/>
+    <circle cx="65" cy="165" r="5" fill="url(#accentGradient)" opacity="0.85"/>
   </g>
-
-  <!-- Subtle border -->
-  <circle cx="100" cy="100" r="95" stroke="white" stroke-width="2.5" fill="none" opacity="0.25"/>
 </svg>
