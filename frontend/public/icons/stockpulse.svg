@@ -15,12 +15,9 @@
     </linearGradient>
   </defs>
 
-  <!-- Background circle with vibrant gradient -->
-  <circle cx="50" cy="50" r="48" fill="url(#bgGrad)"/>
-
   <!-- Box/Package icon with bright colors -->
   <path d="M 30 35 L 50 25 L 70 35 L 70 60 L 50 70 L 30 60 Z"
-        fill="none"
+        fill="url(#bgGrad)"
         stroke="url(#boxGrad)"
         stroke-width="3"
         stroke-linejoin="round"/>

@@ -215,7 +215,8 @@ export default function DashboardPage() {
             {apps.map((app) => (
               <div
                 key={app.app_id}
-                className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col"
+                onClick={() => openApp(app.app_url)}
+                className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col cursor-pointer"
               >
                 <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
 
