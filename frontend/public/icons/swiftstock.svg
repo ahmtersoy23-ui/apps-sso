@@ -1,40 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Modern gradient background -->
+  <!-- Clean gradient background -->
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="boxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
     </linearGradient>
   </defs>
 
-  <!-- Rounded square background -->
-  <rect width="100" height="100" rx="20" fill="url(#bgGradient)"/>
+  <!-- Rounded background -->
+  <rect width="100" height="100" rx="22" fill="url(#bg)"/>
 
-  <!-- Warehouse box stack (3D effect) -->
-  <!-- Back box -->
-  <path d="M 30 35 L 50 25 L 70 35 L 70 50 L 50 60 L 30 50 Z"
-        fill="#1e40af" opacity="0.6"/>
+  <!-- Simple geometric "S" shape made of boxes -->
+  <!-- Top box -->
+  <rect x="30" y="25" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
 
-  <!-- Middle box -->
-  <path d="M 25 45 L 50 32 L 75 45 L 75 62 L 50 75 L 25 62 Z"
-        fill="url(#boxGradient)" stroke="#2563eb" stroke-width="2"/>
+  <!-- Middle connecting box -->
+  <rect x="37" y="40" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
 
-  <!-- Box details (lines) -->
-  <line x1="50" y1="32" x2="50" y2="75" stroke="#3b82f6" stroke-width="2"/>
-  <line x1="25" y1="45" x2="50" y2="32" stroke="#3b82f6" stroke-width="1.5"/>
-  <line x1="75" y1="45" x2="50" y2="32" stroke="#3b82f6" stroke-width="1.5"/>
+  <!-- Bottom box -->
+  <rect x="45" y="55" width="25" height="12" rx="2" fill="#ffffff" opacity="0.95"/>
 
-  <!-- Swift arrow (speed indicator) -->
-  <path d="M 60 55 L 80 55 L 75 50 M 80 55 L 75 60"
-        stroke="#fbbf24" stroke-width="3" stroke-linecap="round"
-        stroke-linejoin="round" fill="none"/>
-
-  <!-- Small accent boxes (indicating multiple items) -->
-  <rect x="20" y="70" width="8" height="8" rx="1" fill="#10b981" opacity="0.8"/>
-  <rect x="32" y="70" width="8" height="8" rx="1" fill="#f59e0b" opacity="0.8"/>
-  <rect x="44" y="70" width="8" height="8" rx="1" fill="#8b5cf6" opacity="0.8"/>
+  <!-- Accent element - swift motion lines -->
+  <line x1="58" y1="31" x2="68" y2="31" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <line x1="52" y1="46" x2="62" y2="46" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <line x1="60" y1="61" x2="70" y2="61" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
 </svg>
