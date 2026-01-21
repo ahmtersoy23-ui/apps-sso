@@ -627,12 +627,16 @@ export default function AdminPage() {
                 const email = formData.get('email') as string;
                 const name = formData.get('name') as string;
 
+                console.log('Creating user:', { email, name });
+
                 try {
-                  await apiService.createUser(email, name);
+                  const result = await apiService.createUser(email, name);
+                  console.log('User created successfully:', result);
                   setShowAddUserModal(false);
                   (e.target as HTMLFormElement).reset();
                   // Reload users after modal is closed
                   await loadUsers();
+                  console.log('Users reloaded');
                 } catch (error) {
                   console.error('Failed to create user:', error);
                   alert('Failed to create user. Email may already exist.');

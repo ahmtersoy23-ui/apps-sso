@@ -75,20 +75,7 @@ export default function DashboardPage() {
   };
 
   const openApp = (appUrl: string) => {
-    // Get current access and refresh tokens
-    const accessToken = authService.getAccessToken();
-    const refreshToken = authService.getRefreshToken();
-
-    // Append tokens as query parameters
-    const url = new URL(appUrl);
-    if (accessToken) {
-      url.searchParams.set('accessToken', accessToken);
-    }
-    if (refreshToken) {
-      url.searchParams.set('refreshToken', refreshToken);
-    }
-
-    window.open(url.toString(), '_blank');
+    window.open(appUrl, '_blank');
   };
 
   // Check if user has admin role in any app

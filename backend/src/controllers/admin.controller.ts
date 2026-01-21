@@ -8,10 +8,14 @@ export class AdminController {
   static async getUsers(req: AuthRequest, res: Response) {
     try {
       // Check if user is admin
+      logger.info(`Admin users request from: ${req.user?.email}, admin check: ${req.user?.apps ? Object.values(req.user.apps).includes('admin') : false}`);
+
       if (!req.user?.apps || !Object.values(req.user.apps).includes('admin')) {
+        logger.warn(`Admin access denied for user: ${req.user?.email}`);
         return res.status(403).json({ error: 'Admin access required' });
       }
 
+      logger.info('Executing getUsers query...');
       const result = await pool.query(`
         SELECT
           u.user_id,
@@ -41,12 +45,16 @@ export class AdminController {
         ORDER BY u.created_at DESC
       `);
 
+      logger.info(`Successfully fetched ${result.rows.length} users`);
+
       res.json({
         success: true,
         data: result.rows
       });
     } catch (error: any) {
       logger.error('Get users error:', error);
+      logger.error('Error stack:', error.stack);
+      logger.error('Error details:', { name: error.name, code: error.code, detail: error.detail });
       res.status(500).json({ error: 'Failed to fetch users', message: error.message });
     }
   }
