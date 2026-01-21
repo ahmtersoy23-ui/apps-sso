@@ -5,18 +5,16 @@
       <stop offset="100%" style="stop-color:#8b5cf6"/>
     </linearGradient>
   </defs>
-  <!-- Background circle -->
-  <circle cx="256" cy="256" r="240" fill="url(#grad)"/>
   <!-- Flask body -->
   <path d="M200 140 L200 220 L140 340 Q120 380 150 410 Q180 440 240 440 L272 440 Q332 440 362 410 Q392 380 372 340 L312 220 L312 140"
-        fill="white" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+        fill="url(#grad)" stroke="url(#grad)" stroke-width="8" stroke-linejoin="round"/>
   <!-- Flask neck -->
-  <rect x="190" y="100" width="132" height="50" rx="8" fill="white"/>
+  <rect x="190" y="100" width="132" height="50" rx="8" fill="url(#grad)"/>
   <!-- Dollar sign in flask -->
   <text x="256" y="360" font-family="Arial, sans-serif" font-size="120" font-weight="bold"
-        fill="#6366f1" text-anchor="middle" dominant-baseline="middle">$</text>
+        fill="white" text-anchor="middle" dominant-baseline="middle">$</text>
   <!-- Bubbles -->
-  <circle cx="180" cy="320" r="15" fill="#a5b4fc" opacity="0.7"/>
-  <circle cx="330" cy="350" r="12" fill="#a5b4fc" opacity="0.7"/>
-  <circle cx="210" cy="380" r="10" fill="#a5b4fc" opacity="0.7"/>
+  <circle cx="180" cy="320" r="15" fill="white" opacity="0.5"/>
+  <circle cx="330" cy="350" r="12" fill="white" opacity="0.5"/>
+  <circle cx="210" cy="380" r="10" fill="white" opacity="0.5"/>
 </svg>
