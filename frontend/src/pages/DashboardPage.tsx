@@ -19,8 +19,6 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const userData = authService.getUser();
-      console.log('User data:', userData);
-      console.log('User apps:', userData?.apps);
       setUser(userData);
 
       const response = await apiService.getMyApps();
@@ -41,7 +39,7 @@ export default function DashboardPage() {
       console.error('Logout error:', error);
     } finally {
       authService.logout();
-      navigate('/');
+      window.location.href = '/';
     }
   };
 
@@ -74,7 +72,6 @@ export default function DashboardPage() {
   };
 
   const isAdmin = user?.apps && Object.values(user.apps).some(role => role === 'admin');
-  console.log('isAdmin:', isAdmin);
 
   if (loading) {
     return (
