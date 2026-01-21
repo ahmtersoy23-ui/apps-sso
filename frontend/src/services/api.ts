@@ -160,6 +160,20 @@ class ApiService {
 
     return response.json();
   }
+
+  async createUser(email: string, name: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ email, name }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create user');
+    }
+
+    return response.json();
+  }
 }
 
 export const apiService = new ApiService();

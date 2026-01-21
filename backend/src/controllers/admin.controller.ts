@@ -196,4 +196,43 @@ export class AdminController {
       res.status(500).json({ error: 'Failed to fetch roles', message: error.message });
     }
   }
+
+  // POST /api/admin/users - Create new user manually
+  static async createUser(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user?.apps || !Object.values(req.user.apps).includes('admin')) {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+
+      const { email, name } = req.body;
+
+      // Check if user already exists
+      const existing = await pool.query(
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+      );
+
+      if (existing.rows.length > 0) {
+        return res.status(400).json({ error: 'User with this email already exists' });
+      }
+
+      // Create user
+      const result = await pool.query(
+        `INSERT INTO users (email, name, is_active)
+         VALUES ($1, $2, true) RETURNING *`,
+        [email, name]
+      );
+
+      logger.info(`User created manually: ${email} by ${req.user.email}`);
+
+      res.json({
+        success: true,
+        data: result.rows[0],
+        message: 'User created successfully'
+      });
+    } catch (error: any) {
+      logger.error('Create user error:', error);
+      res.status(500).json({ error: 'Failed to create user', message: error.message });
+    }
+  }
 }

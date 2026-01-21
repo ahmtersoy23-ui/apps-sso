@@ -9,6 +9,7 @@ router.use(authenticate);
 
 // Users management
 router.get('/users', AdminController.getUsers);
+router.post('/users', AdminController.createUser);
 router.patch('/users/:userId/status', AdminController.toggleUserStatus);
 router.post('/users/:userId/apps', AdminController.assignAppRole);
 router.delete('/users/:userId/apps/:appId', AdminController.removeAppAccess);
