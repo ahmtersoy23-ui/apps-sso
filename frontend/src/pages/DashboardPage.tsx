@@ -75,17 +75,13 @@ export default function DashboardPage() {
   };
 
   const openApp = (appUrl: string) => {
-    // Get current access and refresh tokens
+    // Get current access token
     const accessToken = authService.getAccessToken();
-    const refreshToken = authService.getRefreshToken();
 
-    // Append tokens as query parameters
+    // Append token as query parameter (applications expect 'token' parameter)
     const url = new URL(appUrl);
     if (accessToken) {
-      url.searchParams.set('accessToken', accessToken);
-    }
-    if (refreshToken) {
-      url.searchParams.set('refreshToken', refreshToken);
+      url.searchParams.set('token', accessToken);
     }
 
     window.open(url.toString(), '_blank');
