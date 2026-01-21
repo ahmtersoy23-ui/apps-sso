@@ -184,7 +184,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="mb-6 w-full max-w-[1600px]">
+        <div className="mb-12 w-full max-w-[1600px]">
           <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
           <p className="text-sm text-purple-300">Access all your authorized applications from one place</p>
         </div>
