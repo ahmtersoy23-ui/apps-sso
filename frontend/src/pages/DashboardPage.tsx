@@ -184,7 +184,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="mb-12 w-full max-w-[1600px]">
+        <div className="mb-16 w-full max-w-[1600px]">
           <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
           <p className="text-sm text-purple-300">Access all your authorized applications from one place</p>
         </div>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
 
                 <div className="p-5 h-full flex flex-col justify-center">
                   <div className="flex flex-col items-center flex-1 justify-center">
-                    <div className="flex items-center justify-center mb-4">
+                    <div className="flex items-center justify-center mb-6">
                       <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-4`}>
                         {getAppIcon(app.app_code) ? (
                           <img
@@ -238,7 +238,7 @@ export default function DashboardPage() {
                     </div>
 
                     {app.role_code && (
-                      <div className="flex justify-center mb-3">
+                      <div className="flex justify-center mb-4">
                         <span
                           className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
                             app.role_code
