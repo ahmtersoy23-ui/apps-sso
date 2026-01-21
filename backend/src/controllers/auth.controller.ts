@@ -42,6 +42,7 @@ export class AuthController {
             email: user.email,
             name: user.name,
             picture: user.profile_picture,
+            apps: apps, // Add apps object to user for frontend admin check
           },
           accessToken,
           refreshToken,
