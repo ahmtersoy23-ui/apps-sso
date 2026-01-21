@@ -71,7 +71,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
       <header className="bg-black/20 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="px-6 lg:px-12 xl:px-20 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <button
@@ -114,7 +114,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="px-6 lg:px-12 xl:px-20 py-8">
         {/* Tabs */}
         <div className="mb-8">
           <div className="border-b border-white/10">
