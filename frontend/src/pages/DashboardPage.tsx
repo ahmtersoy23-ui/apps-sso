@@ -93,7 +93,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
       {/* Header */}
       <header className="bg-black/20 backdrop-blur-lg border-b border-white/10">
         <div className="px-6 lg:px-12 xl:px-20 py-4">
@@ -172,7 +172,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 lg:px-12 xl:px-20 py-6 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
+      <main className="px-6 lg:px-12 xl:px-20 py-6 flex flex-col items-center justify-center flex-1">
         {error && (
           <div className="mb-6 bg-red-500/10 backdrop-blur-sm border border-red-500/20 text-red-300 rounded-xl p-4">
             <div className="flex items-center">
