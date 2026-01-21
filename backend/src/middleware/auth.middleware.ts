@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { TokenPayload } from '../types';
+import { logger } from '../config/logger';
 
 export interface AuthRequest extends Request {
   user?: TokenPayload;
@@ -8,17 +9,21 @@ export interface AuthRequest extends Request {
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    logger.info(`Auth middleware: ${req.method} ${req.path}`);
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logger.warn(`No auth header for ${req.path}`);
       return res.status(401).json({ error: 'No token provided' });
     }
 
     const token = authHeader.substring(7);
     const payload = AuthService.verifyToken(token);
 
+    logger.info(`Token verified for user: ${payload.email}`);
     req.user = payload;
     next();
   } catch (error: any) {
+    logger.error(`Auth error for ${req.path}:`, error.message);
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
     }

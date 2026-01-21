@@ -24,7 +24,7 @@ export class AdminController {
           u.profile_picture,
           u.is_active,
           u.created_at,
-          u.last_login,
+          u.last_login_at as last_login,
           COALESCE(
             json_agg(
               json_build_object(
