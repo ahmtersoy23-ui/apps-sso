@@ -1,4 +1,4 @@
-import type { Application, LoginResponse, ApiResponse } from '../types';
+import type { Application, LoginResponse, ApiResponse, AdminUser, AdminApplication, Role } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://apps.iwa.web.tr/api';
 
@@ -75,6 +75,87 @@ class ApiService {
 
     if (!response.ok) {
       throw new Error('Failed to fetch user applications');
+    }
+
+    return response.json();
+  }
+
+  // Admin API methods
+  async getAdminUsers(): Promise<ApiResponse<AdminUser[]>> {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+
+    return response.json();
+  }
+
+  async toggleUserStatus(userId: string, isActive: boolean): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}/status`, {
+      method: 'PATCH',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ is_active: isActive }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user status');
+    }
+
+    return response.json();
+  }
+
+  async assignAppRole(userId: string, appId: string, roleId: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}/apps`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ app_id: appId, role_id: roleId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to assign app role');
+    }
+
+    return response.json();
+  }
+
+  async removeAppAccess(userId: string, appId: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}/apps/${appId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to remove app access');
+    }
+
+    return response.json();
+  }
+
+  async getAdminApplications(): Promise<ApiResponse<AdminApplication[]>> {
+    const response = await fetch(`${API_URL}/admin/applications`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch applications');
+    }
+
+    return response.json();
+  }
+
+  async getRoles(): Promise<ApiResponse<Role[]>> {
+    const response = await fetch(`${API_URL}/admin/roles`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch roles');
     }
 
     return response.json();
