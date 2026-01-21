@@ -165,7 +165,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 lg:px-12 xl:px-20 py-6">
+      <main className="px-6 lg:px-12 xl:px-20 py-6 flex flex-col items-center justify-center min-h-[calc(100vh-140px)]">
         {error && (
           <div className="mb-6 bg-red-500/10 backdrop-blur-sm border border-red-500/20 text-red-300 rounded-xl p-4">
             <div className="flex items-center">
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="mb-6">
+        <div className="mb-6 w-full max-w-[1600px]">
           <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
           <p className="text-sm text-purple-300">Access all your authorized applications from one place</p>
         </div>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
             <p className="text-purple-400 text-sm">Contact your administrator for access.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center max-w-[1800px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 place-items-center w-full max-w-[1600px]">
             {apps.map((app) => (
               <div
                 key={app.app_id}
