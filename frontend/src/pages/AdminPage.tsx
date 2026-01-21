@@ -1,14 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth';
+import { apiService } from '../services/api';
+import type { Application } from '../types';
 
 export default function AdminPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'roles'>('users');
+  const [apps, setApps] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
   const user = authService.getUser();
 
+  useEffect(() => {
+    loadApps();
+  }, []);
+
+  const loadApps = async () => {
+    try {
+      const response = await apiService.getMyApps();
+      if (response.success) {
+        setApps(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load apps:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Check if user is admin
-  const isAdmin = user?.apps && Object.values(user.apps).some(role => role === 'admin');
+  const isAdmin = apps.some(app => app.role_code === 'admin');
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+          <p className="mt-4 text-white text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
