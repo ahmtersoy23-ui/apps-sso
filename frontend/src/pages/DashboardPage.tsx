@@ -19,9 +19,6 @@ export default function DashboardPage() {
     try {
       setLoading(true);
       const userData = authService.getUser();
-      console.log('🔍 User data from localStorage:', userData);
-      console.log('🔍 User apps:', userData?.apps);
-      console.log('🔍 Apps values:', userData?.apps ? Object.values(userData.apps) : 'no apps');
       setUser(userData);
 
       const response = await apiService.getMyApps();
@@ -74,8 +71,8 @@ export default function DashboardPage() {
     window.open(appUrl, '_blank');
   };
 
-  const isAdmin = user?.apps && Object.values(user.apps).some(role => role === 'admin');
-  console.log('🔍 isAdmin calculated:', isAdmin);
+  // Check if user has admin role in any app
+  const isAdmin = apps.some(app => app.role_code === 'admin');
 
   if (loading) {
     return (
