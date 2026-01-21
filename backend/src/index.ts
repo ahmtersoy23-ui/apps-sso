@@ -8,6 +8,7 @@ import { connectRedis, disconnectRedis } from './config/redis';
 import { logger } from './config/logger';
 import authRoutes from './routes/auth.routes';
 import appsRoutes from './routes/apps.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.get('/health', async (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/apps', appsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
