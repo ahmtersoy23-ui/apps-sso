@@ -219,50 +219,52 @@ export default function DashboardPage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
 
-                <div className="p-6 h-full flex flex-col">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className={`h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-3`}>
-                      {getAppIcon(app.app_code) ? (
-                        <img
-                          src={getAppIcon(app.app_code)!}
-                          alt={app.app_name}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <span className="text-purple-600 text-2xl font-bold">
-                          {app.app_name.charAt(0)}
+                <div className="p-5 h-full flex flex-col justify-between">
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-4`}>
+                        {getAppIcon(app.app_code) ? (
+                          <img
+                            src={getAppIcon(app.app_code)!}
+                            alt={app.app_name}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-purple-600 text-3xl font-bold">
+                            {app.app_name.charAt(0)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {app.role_code && (
+                      <div className="flex justify-center mb-3">
+                        <span
+                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
+                            app.role_code
+                          )} shadow-lg`}
+                        >
+                          {app.role_name}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
+
+                    <h3 className="text-lg font-bold text-white mb-3 text-center group-hover:text-purple-300 transition-colors">
+                      {getAppDisplayName(app.app_name, app.app_code)}
+                    </h3>
+
+                    <p className="text-sm text-purple-300 text-center leading-relaxed min-h-[2.5rem]">
+                      {app.app_description}
+                    </p>
                   </div>
-
-                  {app.role_code && (
-                    <div className="flex justify-center mb-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
-                          app.role_code
-                        )} shadow-lg`}
-                      >
-                        {app.role_name}
-                      </span>
-                    </div>
-                  )}
-
-                  <h3 className="text-base font-bold text-white mb-2 text-center group-hover:text-purple-300 transition-colors">
-                    {getAppDisplayName(app.app_name, app.app_code)}
-                  </h3>
-
-                  <p className="text-xs text-purple-300 mb-4 text-center leading-relaxed flex-grow min-h-[2.5rem]">
-                    {app.app_description}
-                  </p>
 
                   <button
                     onClick={() => openApp(app.app_url)}
-                    className="w-full inline-flex justify-center items-center px-3 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xs rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70"
+                    className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70 mt-4"
                   >
                     Open Application
                     <svg
-                      className="ml-1.5 h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform"
+                      className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
