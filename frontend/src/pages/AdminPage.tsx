@@ -629,9 +629,10 @@ export default function AdminPage() {
 
                 try {
                   await apiService.createUser(email, name);
-                  await loadUsers();
                   setShowAddUserModal(false);
                   (e.target as HTMLFormElement).reset();
+                  // Reload users after modal is closed
+                  await loadUsers();
                 } catch (error) {
                   console.error('Failed to create user:', error);
                   alert('Failed to create user. Email may already exist.');
