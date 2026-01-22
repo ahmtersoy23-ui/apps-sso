@@ -10,7 +10,7 @@ export class AuthController {
       const { token } = req.body;
 
       if (!token) {
-        return res.status(400).json({ error: 'Google token is required' });
+        return res.status(400).json({ success: false, error: 'Google token is required' });
       }
 
       // Verify Google token
@@ -20,7 +20,7 @@ export class AuthController {
       const user = await AuthService.findOrCreateUser(googleData);
 
       if (!user.is_active) {
-        return res.status(403).json({ error: 'Account is inactive' });
+        return res.status(403).json({ success: false, error: 'Account is inactive' });
       }
 
       // Get user's app permissions
@@ -51,7 +51,7 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Google login error:', error);
-      res.status(500).json({ error: 'Authentication failed', message: error.message });
+      res.status(500).json({ success: false, error: 'Authentication failed', message: error.message });
     }
   }
 
@@ -61,14 +61,14 @@ export class AuthController {
       const { token, app_code } = req.body;
 
       if (!token) {
-        return res.status(400).json({ error: 'Token is required' });
+        return res.status(400).json({ success: false, error: 'Token is required' });
       }
 
       const payload = AuthService.verifyToken(token);
 
       // Check if user has access to the requested app
       if (app_code && !payload.apps[app_code]) {
-        return res.status(403).json({ error: 'No access to this application' });
+        return res.status(403).json({ success: false, error: 'No access to this application' });
       }
 
       res.json({
@@ -85,7 +85,7 @@ export class AuthController {
         },
       });
     } catch (error: any) {
-      res.status(401).json({ error: 'Invalid token', message: error.message });
+      res.status(401).json({ success: false, error: 'Invalid token', message: error.message });
     }
   }
 
@@ -93,7 +93,7 @@ export class AuthController {
   static async logout(req: AuthRequest, res: Response) {
     try {
       if (!req.user) {
-        return res.status(401).json({ error: 'Not authenticated' });
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
       }
 
       await AuthService.revokeToken(req.user.sub);
@@ -103,7 +103,7 @@ export class AuthController {
       res.json({ success: true, message: 'Logged out successfully' });
     } catch (error: any) {
       logger.error('Logout error:', error);
-      res.status(500).json({ error: 'Logout failed', message: error.message });
+      res.status(500).json({ success: false, error: 'Logout failed', message: error.message });
     }
   }
 
@@ -111,7 +111,7 @@ export class AuthController {
   static async me(req: AuthRequest, res: Response) {
     try {
       if (!req.user) {
-        return res.status(401).json({ error: 'Not authenticated' });
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
       }
 
       res.json({
@@ -127,7 +127,7 @@ export class AuthController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({ error: 'Failed to get user info', message: error.message });
+      res.status(500).json({ success: false, error: 'Failed to get user info', message: error.message });
     }
   }
 }
