@@ -4,13 +4,13 @@ import { query } from '../config/database';
 import { redisClient } from '../config/redis';
 import { TokenPayload, User } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
-
-if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
   console.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET environment variables are required');
   process.exit(1);
 }
+
+const JWT_SECRET: string = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET;
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
