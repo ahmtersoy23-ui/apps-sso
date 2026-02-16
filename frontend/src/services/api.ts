@@ -47,6 +47,19 @@ class ApiService {
     return response.json();
   }
 
+  async refreshAccessToken(): Promise<ApiResponse<{ accessToken: string; refreshToken: string; apps: Record<string, string> }>> {
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    return response.json();
+  }
+
   async logout(): Promise<void> {
     await fetch(`${API_URL}/auth/logout`, {
       method: 'POST',

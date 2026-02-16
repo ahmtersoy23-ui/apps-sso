@@ -15,6 +15,7 @@ export interface Application {
   app_description: string;
   app_url: string;
   app_icon?: string;
+  app_type?: string; // 'application' or 'tool'
   role_code?: string;
   role_name?: string;
   role_description?: string;

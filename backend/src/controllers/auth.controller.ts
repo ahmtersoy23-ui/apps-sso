@@ -130,4 +130,44 @@ export class AuthController {
       res.status(500).json({ success: false, error: 'Failed to get user info', message: error.message });
     }
   }
+
+  // POST /api/auth/refresh-token - Refresh access token with latest permissions
+  static async refreshToken(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
+      }
+
+      // Get fresh user data and permissions from database
+      const { apps } = await AuthService.getUserApps(req.user.sub);
+
+      // Generate new tokens with updated permissions
+      const { accessToken, refreshToken } = AuthService.generateTokens(
+        {
+          user_id: req.user.sub,
+          email: req.user.email,
+          name: req.user.name,
+          profile_picture: req.user.picture,
+        } as any,
+        apps
+      );
+
+      // Store new tokens
+      await AuthService.storeToken(req.user.sub, accessToken, refreshToken);
+
+      logger.info(`Token refreshed for user: ${req.user.email}`);
+
+      res.json({
+        success: true,
+        data: {
+          accessToken,
+          refreshToken,
+          apps,
+        },
+      });
+    } catch (error: any) {
+      logger.error('Token refresh error:', error);
+      res.status(500).json({ success: false, error: 'Token refresh failed', message: error.message });
+    }
+  }
 }

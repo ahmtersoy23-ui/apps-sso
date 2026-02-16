@@ -28,7 +28,15 @@ app.use(express.urlencoded({ extended: true }));
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
-  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests',
+      message: 'Too many requests from this IP, please try again later.',
+    });
+  },
 });
 app.use('/api/', limiter);
 

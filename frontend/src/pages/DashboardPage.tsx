@@ -63,32 +63,135 @@ export default function DashboardPage() {
       'pricelab': '/icons/pricelab.svg',
       'manumaestro': '/icons/manumaestro.svg',
       'swiftstock': '/icons/swiftstock.svg',
+      'shipmate': '/icons/shipmate.svg',
+      'fundmate': '/icons/fundmate.svg',
     };
     return icons[appCode.toLowerCase()] || null;
   };
 
   const getAppDisplayName = (appName: string, appCode: string) => {
     const displayNames: Record<string, string> = {
-      'amzsellmetrics': 'Amazon Sell Metrics',
+      'amzsellmetrics': 'AmzSellMetrics',
     };
     return displayNames[appCode.toLowerCase()] || appName;
   };
 
-  const openApp = (appUrl: string) => {
-    // Get current access token
-    const accessToken = authService.getAccessToken();
+  const openApp = async (appUrl: string) => {
+    console.log('[Dashboard] Opening app:', appUrl);
 
-    // Append token as query parameter (applications expect 'token' parameter)
-    const url = new URL(appUrl);
-    if (accessToken) {
-      url.searchParams.set('token', accessToken);
+    try {
+      // Refresh token to get latest permissions
+      console.log('[Dashboard] Refreshing access token with latest permissions...');
+      const refreshResponse = await apiService.refreshAccessToken();
+
+      if (refreshResponse.success) {
+        const { accessToken, refreshToken } = refreshResponse.data;
+        authService.setTokens(accessToken, refreshToken);
+        console.log('[Dashboard] Token refreshed successfully');
+        console.log('[Dashboard] New token apps:', refreshResponse.data.apps);
+
+        const url = new URL(appUrl);
+        url.searchParams.set('token', accessToken);
+        url.hash = `token=${accessToken}`;
+        console.log('[Dashboard] Final URL:', url.toString());
+        window.open(url.toString(), '_blank');
+      } else {
+        console.error('[Dashboard] Token refresh failed');
+        // Fallback to old token
+        const accessToken = authService.getAccessToken();
+        if (accessToken) {
+          const url = new URL(appUrl);
+          url.searchParams.set('token', accessToken);
+          url.hash = `token=${accessToken}`;
+          window.open(url.toString(), '_blank');
+        }
+      }
+    } catch (error) {
+      console.error('[Dashboard] Error refreshing token:', error);
+      // Fallback to old token
+      const accessToken = authService.getAccessToken();
+      if (accessToken) {
+        const url = new URL(appUrl);
+        url.searchParams.set('token', accessToken);
+        url.hash = `token=${accessToken}`;
+        window.open(url.toString(), '_blank');
+      }
     }
-
-    window.open(url.toString(), '_blank');
   };
 
   // Check if user has admin role in any app
   const isAdmin = apps.some(app => app.role_code === 'admin');
+
+  // Render app/tool card
+  const renderCard = (app: Application, isToolCard: boolean = false) => (
+    <div
+      key={app.app_id}
+      onClick={() => openApp(app.app_url)}
+      className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col cursor-pointer"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
+
+      <div className="p-5 h-full flex flex-col justify-center">
+        <div className="flex flex-col items-center flex-1 justify-center">
+          <div className="flex items-center justify-center" style={{ marginBottom: '1.5rem' }}>
+            <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-4`}>
+              {getAppIcon(app.app_code) ? (
+                <img
+                  src={getAppIcon(app.app_code)!}
+                  alt={app.app_name}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-purple-600 text-3xl font-bold">
+                  {app.app_name.charAt(0)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {!isToolCard && app.role_code && (
+            <div className="flex justify-center" style={{ marginBottom: '1rem' }}>
+              <span
+                className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
+                  app.role_code
+                )} shadow-lg`}
+              >
+                {app.role_name}
+              </span>
+            </div>
+          )}
+
+          <h3 className="text-lg font-bold text-white mb-3 text-center group-hover:text-purple-300 transition-colors">
+            {getAppDisplayName(app.app_name, app.app_code)}
+          </h3>
+
+          <p className="text-sm text-purple-300 text-center leading-relaxed min-h-[2.5rem]">
+            {app.app_description}
+          </p>
+        </div>
+
+        <button
+          onClick={() => openApp(app.app_url)}
+          className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70"
+        >
+          {isToolCard ? 'Open Tool' : 'Open Application'}
+          <svg
+            className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -193,13 +296,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="w-full max-w-[1600px]" style={{ marginBottom: '4rem' }}>
-          <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
-          <p className="text-sm text-purple-300">Access all your authorized applications from one place</p>
-        </div>
-
         {apps.length === 0 ? (
-          <div className="text-center py-16 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+          <div className="text-center py-16 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 w-full max-w-[1600px]">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-500/20 rounded-full mb-4">
               <svg
                 className="h-10 w-10 text-purple-400"
@@ -215,82 +313,38 @@ export default function DashboardPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">No applications</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">No applications or tools</h3>
             <p className="text-purple-300 mb-1">You don't have access to any applications yet.</p>
             <p className="text-purple-400 text-sm">Contact your administrator for access.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 w-full max-w-[1800px]">
-            {apps.map((app) => (
-              <div
-                key={app.app_id}
-                onClick={() => openApp(app.app_url)}
-                className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
-
-                <div className="p-5 h-full flex flex-col justify-center">
-                  <div className="flex flex-col items-center flex-1 justify-center">
-                    <div className="flex items-center justify-center" style={{ marginBottom: '1.5rem' }}>
-                      <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-4`}>
-                        {getAppIcon(app.app_code) ? (
-                          <img
-                            src={getAppIcon(app.app_code)!}
-                            alt={app.app_name}
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          <span className="text-purple-600 text-3xl font-bold">
-                            {app.app_name.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {app.role_code && (
-                      <div className="flex justify-center" style={{ marginBottom: '1rem' }}>
-                        <span
-                          className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
-                            app.role_code
-                          )} shadow-lg`}
-                        >
-                          {app.role_name}
-                        </span>
-                      </div>
-                    )}
-
-                    <h3 className="text-lg font-bold text-white mb-3 text-center group-hover:text-purple-300 transition-colors">
-                      {getAppDisplayName(app.app_name, app.app_code)}
-                    </h3>
-
-                    <p className="text-sm text-purple-300 text-center leading-relaxed min-h-[2.5rem]">
-                      {app.app_description}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => openApp(app.app_url)}
-                    className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70"
-                  >
-                    Open Application
-                    <svg
-                      className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </button>
+          <>
+            {/* Applications Section */}
+            {apps.filter(app => app.app_type !== 'tool').length > 0 && (
+              <div className="w-full max-w-[1800px] mb-12">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
+                  <p className="text-sm text-purple-300">Full-featured business applications</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {apps.filter(app => app.app_type !== 'tool').map((app) => renderCard(app, false))}
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+
+            {/* Tools Section */}
+            {apps.filter(app => app.app_type === 'tool').length > 0 && (
+              <div className="w-full max-w-[1800px]">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-1">Your Tools</h2>
+                  <p className="text-sm text-purple-300">Quick utilities and helpers</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {apps.filter(app => app.app_type === 'tool').map((app) => renderCard(app, true))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
 
