@@ -109,6 +109,8 @@ export class AuthService {
 
   // Store token in Redis
   static async storeToken(userId: string, accessToken: string, refreshToken: string) {
+    // Clear any previous revocation
+    await AuthService.clearRevocation(userId);
     const tokenKey = `token:${userId}`;
     await redisClient.setEx(tokenKey, 7 * 24 * 60 * 60, JSON.stringify({ accessToken, refreshToken }));
 
@@ -120,14 +122,43 @@ export class AuthService {
     );
   }
 
-  // Verify JWT token
+  // Verify JWT token (signature only - for /verify endpoint called by other apps)
   static verifyToken(token: string): TokenPayload {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   }
 
+  // Verify JWT token with revocation check (for protected routes on SSO portal itself)
+  static async verifyTokenWithRevocationCheck(token: string): Promise<TokenPayload> {
+    const payload = jwt.verify(token, JWT_SECRET) as TokenPayload;
+
+    // Check if token is revoked in Redis
+    const isRevoked = await redisClient.get(`revoked:${payload.sub}`);
+    if (isRevoked) {
+      throw new Error('Token has been revoked');
+    }
+
+    // Verify token matches the one stored in Redis (prevents old token reuse)
+    const storedToken = await redisClient.get(`token:${payload.sub}`);
+    if (storedToken) {
+      const stored = JSON.parse(storedToken);
+      if (stored.accessToken !== token) {
+        throw new Error('Token has been superseded');
+      }
+    }
+
+    return payload;
+  }
+
   // Revoke token
   static async revokeToken(userId: string) {
+    // Set revocation flag with TTL matching token expiry
+    await redisClient.setEx(`revoked:${userId}`, 7 * 24 * 60 * 60, 'true');
     await redisClient.del(`token:${userId}`);
-    await query('UPDATE auth_tokens SET is_revoked = true WHERE user_id = $1', [userId]);
+    await query('UPDATE auth_tokens SET is_revoked = true WHERE user_id = $1 AND is_revoked = false', [userId]);
+  }
+
+  // Clear revocation flag (called on new login)
+  static async clearRevocation(userId: string) {
+    await redisClient.del(`revoked:${userId}`);
   }
 }

@@ -15,7 +15,7 @@ export const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  console.error('Database pool error:', err.message);
   process.exit(-1);
 });
 
@@ -23,6 +23,9 @@ export const query = async (text: string, params?: any[]) => {
   const start = Date.now();
   const res = await pool.query(text, params);
   const duration = Date.now() - start;
-  console.log('executed query', { text, duration, rows: res.rowCount });
+  // Only log slow queries in production; avoid logging full SQL text
+  if (duration > 500) {
+    console.warn('Slow query', { duration, rows: res.rowCount });
+  }
   return res;
 };

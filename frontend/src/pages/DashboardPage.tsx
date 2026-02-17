@@ -76,28 +76,41 @@ export default function DashboardPage() {
     return displayNames[appCode.toLowerCase()] || appName;
   };
 
+  // Validate app URL against trusted domains to prevent open redirect
+  const TRUSTED_DOMAINS = ['iwa.web.tr', 'apps.iwa.web.tr'];
+  const isValidAppUrl = (url: string): boolean => {
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:') return false;
+      return TRUSTED_DOMAINS.some(domain =>
+        parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
+      );
+    } catch {
+      return false;
+    }
+  };
+
   const openApp = async (appUrl: string) => {
-    console.log('[Dashboard] Opening app:', appUrl);
+    // Validate URL before opening
+    if (!isValidAppUrl(appUrl)) {
+      console.error('Blocked navigation to untrusted URL:', appUrl);
+      return;
+    }
 
     try {
-      // Refresh token to get latest permissions
-      console.log('[Dashboard] Refreshing access token with latest permissions...');
       const refreshResponse = await apiService.refreshAccessToken();
 
       if (refreshResponse.success) {
         const { accessToken, refreshToken } = refreshResponse.data;
         authService.setTokens(accessToken, refreshToken);
-        console.log('[Dashboard] Token refreshed successfully');
-        console.log('[Dashboard] New token apps:', refreshResponse.data.apps);
 
+        // Send token via query param (for server-side middleware like Next.js)
+        // and hash (for client-side SPAs - more secure, not sent in HTTP requests)
         const url = new URL(appUrl);
         url.searchParams.set('token', accessToken);
         url.hash = `token=${accessToken}`;
-        console.log('[Dashboard] Final URL:', url.toString());
         window.open(url.toString(), '_blank');
       } else {
-        console.error('[Dashboard] Token refresh failed');
-        // Fallback to old token
         const accessToken = authService.getAccessToken();
         if (accessToken) {
           const url = new URL(appUrl);
@@ -107,8 +120,7 @@ export default function DashboardPage() {
         }
       }
     } catch (error) {
-      console.error('[Dashboard] Error refreshing token:', error);
-      // Fallback to old token
+      console.error('Error refreshing token:', error);
       const accessToken = authService.getAccessToken();
       if (accessToken) {
         const url = new URL(appUrl);

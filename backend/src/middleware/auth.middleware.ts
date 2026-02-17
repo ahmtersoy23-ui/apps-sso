@@ -9,23 +9,23 @@ export interface AuthRequest extends Request {
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    logger.info(`Auth middleware: ${req.method} ${req.path}`);
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      logger.warn(`No auth header for ${req.path}`);
       return res.status(401).json({ error: 'No token provided' });
     }
 
     const token = authHeader.substring(7);
-    const payload = AuthService.verifyToken(token);
+    const payload = await AuthService.verifyTokenWithRevocationCheck(token);
 
-    logger.info(`Token verified for user: ${payload.email}`);
     req.user = payload;
     next();
   } catch (error: any) {
     logger.error(`Auth error for ${req.path}:`, error.message);
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
+    }
+    if (error.message === 'Token has been revoked' || error.message === 'Token has been superseded') {
+      return res.status(401).json({ error: 'Token has been revoked' });
     }
     return res.status(401).json({ error: 'Invalid token' });
   }
@@ -37,7 +37,6 @@ export const requireRole = (allowedRoles: string[]) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Check if user has admin role in any app
     const hasRole = Object.values(req.user.apps).some(role => allowedRoles.includes(role));
 
     if (!hasRole) {

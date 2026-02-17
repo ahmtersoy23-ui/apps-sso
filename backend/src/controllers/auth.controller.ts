@@ -9,7 +9,7 @@ export class AuthController {
     try {
       const { token } = req.body;
 
-      if (!token) {
+      if (!token || typeof token !== 'string') {
         return res.status(400).json({ success: false, error: 'Google token is required' });
       }
 
@@ -42,7 +42,7 @@ export class AuthController {
             email: user.email,
             name: user.name,
             picture: user.profile_picture,
-            apps: apps, // Add apps object to user for frontend admin check
+            apps: apps,
           },
           accessToken,
           refreshToken,
@@ -51,20 +51,25 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Google login error:', error);
-      res.status(500).json({ success: false, error: 'Authentication failed', message: error.message });
+      res.status(500).json({ success: false, error: 'Authentication failed' });
     }
   }
 
-  // POST /api/auth/verify - Verify JWT token
+  // POST /api/auth/verify - Verify JWT token (called by other apps)
   static async verifyToken(req: Request, res: Response) {
     try {
       const { token, app_code } = req.body;
 
-      if (!token) {
+      if (!token || typeof token !== 'string') {
         return res.status(400).json({ success: false, error: 'Token is required' });
       }
 
-      const payload = AuthService.verifyToken(token);
+      if (app_code && typeof app_code !== 'string') {
+        return res.status(400).json({ success: false, error: 'Invalid app_code' });
+      }
+
+      // Verify token signature + revocation check
+      const payload = await AuthService.verifyTokenWithRevocationCheck(token);
 
       // Check if user has access to the requested app
       if (app_code && !payload.apps[app_code]) {
@@ -85,7 +90,10 @@ export class AuthController {
         },
       });
     } catch (error: any) {
-      res.status(401).json({ success: false, error: 'Invalid token', message: error.message });
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ success: false, error: 'Token expired' });
+      }
+      res.status(401).json({ success: false, error: 'Invalid token' });
     }
   }
 
@@ -103,7 +111,7 @@ export class AuthController {
       res.json({ success: true, message: 'Logged out successfully' });
     } catch (error: any) {
       logger.error('Logout error:', error);
-      res.status(500).json({ success: false, error: 'Logout failed', message: error.message });
+      res.status(500).json({ success: false, error: 'Logout failed' });
     }
   }
 
@@ -127,7 +135,7 @@ export class AuthController {
         },
       });
     } catch (error: any) {
-      res.status(500).json({ success: false, error: 'Failed to get user info', message: error.message });
+      res.status(500).json({ success: false, error: 'Failed to get user info' });
     }
   }
 
@@ -167,7 +175,7 @@ export class AuthController {
       });
     } catch (error: any) {
       logger.error('Token refresh error:', error);
-      res.status(500).json({ success: false, error: 'Token refresh failed', message: error.message });
+      res.status(500).json({ success: false, error: 'Token refresh failed' });
     }
   }
 }
