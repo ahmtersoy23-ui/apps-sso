@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || [],
   credentials: true,
 }));
 app.use(express.json());
@@ -39,6 +39,21 @@ const limiter = rateLimit({
   },
 });
 app.use('/api/', limiter);
+
+// Stricter rate limit for auth endpoints (10 requests per 15 minutes)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many authentication attempts, please try again later.',
+    });
+  },
+});
+app.use('/api/auth/google', authLimiter);
 
 // Routes
 app.get('/health', async (req, res) => {
@@ -63,9 +78,10 @@ app.use('/api/apps', appsRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error('Unhandled error:', err);
   res.status(500).json({
+    success: false,
     error: 'Internal server error',
     message: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });

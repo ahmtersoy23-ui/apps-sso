@@ -20,7 +20,7 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-export const query = async (text: string, params?: any[]) => {
+export const query = async (text: string, params?: (string | number | boolean | null | object)[]) => {
   const start = Date.now();
   const res = await pool.query(text, params);
   const duration = Date.now() - start;

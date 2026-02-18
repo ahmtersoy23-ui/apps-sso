@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { pool } from '../config/database';
 import { logger } from '../config/logger';
+import { logAudit } from '../utils/auditLog';
 
 // UUID v4 validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -57,7 +58,7 @@ export class AdminController {
         success: true,
         data: result.rows
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Get users error:', error);
       res.status(500).json({ error: 'Failed to fetch users' });
     }
@@ -86,12 +87,13 @@ export class AdminController {
       );
 
       logger.info(`User ${userId} status changed to ${is_active} by ${req.user!.email}`);
+      await logAudit(req.user!.sub, 'USER_STATUS_CHANGE', { targetUserId: userId, is_active }, req.ip || 'unknown');
 
       res.json({
         success: true,
         message: `User ${is_active ? 'activated' : 'deactivated'} successfully`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Toggle user status error:', error);
       res.status(500).json({ error: 'Failed to update user status' });
     }
@@ -130,12 +132,13 @@ export class AdminController {
       }
 
       logger.info(`App role assigned: user=${userId}, app=${app_id}, role=${role_id} by ${req.user!.email}`);
+      await logAudit(req.user!.sub, 'ROLE_ASSIGNMENT', { targetUserId: userId, appId: app_id, roleId: role_id }, req.ip || 'unknown');
 
       res.json({
         success: true,
         message: 'App role assigned successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Assign app role error:', error);
       res.status(500).json({ error: 'Failed to assign app role' });
     }
@@ -160,12 +163,13 @@ export class AdminController {
       );
 
       logger.info(`App access removed: user=${userId}, app=${appId} by ${req.user!.email}`);
+      await logAudit(req.user!.sub, 'ROLE_REMOVAL', { targetUserId: userId, appId }, req.ip || 'unknown');
 
       res.json({
         success: true,
         message: 'App access removed successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Remove app access error:', error);
       res.status(500).json({ error: 'Failed to remove app access' });
     }
@@ -197,7 +201,7 @@ export class AdminController {
         success: true,
         data: result.rows
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Get applications error:', error);
       res.status(500).json({ error: 'Failed to fetch applications' });
     }
@@ -216,7 +220,7 @@ export class AdminController {
         success: true,
         data: result.rows
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Get roles error:', error);
       res.status(500).json({ error: 'Failed to fetch roles' });
     }
@@ -256,13 +260,14 @@ export class AdminController {
       );
 
       logger.info(`User created manually: ${email} by ${req.user!.email}`);
+      await logAudit(req.user!.sub, 'USER_CREATED', { email, name: name.trim() }, req.ip || 'unknown');
 
       res.json({
         success: true,
         data: result.rows[0],
         message: 'User created successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Create user error:', error);
       res.status(500).json({ error: 'Failed to create user' });
     }

@@ -36,7 +36,7 @@ export default function DashboardPage() {
     try {
       await apiService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      // logout failed silently
     } finally {
       authService.logout();
       window.location.href = '/';
@@ -93,7 +93,7 @@ export default function DashboardPage() {
   const openApp = async (appUrl: string) => {
     // Validate URL before opening
     if (!isValidAppUrl(appUrl)) {
-      console.error('Blocked navigation to untrusted URL:', appUrl);
+      // blocked: untrusted URL
       return;
     }
 
@@ -119,7 +119,7 @@ export default function DashboardPage() {
         }
       }
     } catch (error) {
-      console.error('Error refreshing token:', error);
+      // token refresh failed, use existing token
       const accessToken = authService.getAccessToken();
       if (accessToken) {
         const url = new URL(appUrl);

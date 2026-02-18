@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/auth';
 import { apiService } from '../services/api';
 import type { Application, AdminUser, AdminApplication, Role } from '../types';
+import UserTable from './admin/UserTable';
+import AppList from './admin/AppList';
+import RolesView from './admin/RolesView';
+import AddUserModal from './admin/AddUserModal';
+import AssignRoleModal from './admin/AssignRoleModal';
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -31,8 +36,8 @@ export default function AdminPage() {
       if (response.success) {
         setApps(response.data);
       }
-    } catch (error) {
-      console.error('Failed to load apps:', error);
+    } catch {
+      // silently handled
     } finally {
       setLoading(false);
     }
@@ -44,8 +49,8 @@ export default function AdminPage() {
       if (response.success) {
         setUsers(response.data);
       }
-    } catch (error) {
-      console.error('Failed to load users:', error);
+    } catch {
+      // silently handled
     }
   };
 
@@ -55,8 +60,8 @@ export default function AdminPage() {
       if (response.success) {
         setApplications(response.data);
       }
-    } catch (error) {
-      console.error('Failed to load applications:', error);
+    } catch {
+      // silently handled
     }
   };
 
@@ -66,8 +71,8 @@ export default function AdminPage() {
       if (response.success) {
         setRoles(response.data);
       }
-    } catch (error) {
-      console.error('Failed to load roles:', error);
+    } catch {
+      // silently handled
     }
   };
 
@@ -75,8 +80,7 @@ export default function AdminPage() {
     try {
       await apiService.toggleUserStatus(userId, !currentStatus);
       await loadUsers();
-    } catch (error) {
-      console.error('Failed to toggle user status:', error);
+    } catch {
       alert('Failed to update user status');
     }
   };
@@ -88,10 +92,23 @@ export default function AdminPage() {
     try {
       await apiService.removeAppAccess(userId, appId);
       await loadUsers();
-    } catch (error) {
-      console.error('Failed to remove app access:', error);
+    } catch {
       alert('Failed to remove app access');
     }
+  };
+
+  const handleAddUser = async (email: string, name: string) => {
+    await apiService.createUser(email, name);
+    setShowAddUserModal(false);
+    await loadUsers();
+  };
+
+  const handleAssignRole = async (appId: string, roleId: string) => {
+    if (!selectedUser) return;
+    await apiService.assignAppRole(selectedUser.user_id, appId, roleId);
+    await loadUsers();
+    setShowAssignModal(false);
+    setSelectedUser(null);
   };
 
   const filteredUsers = users.filter(u =>
@@ -242,562 +259,39 @@ export default function AdminPage() {
         {/* Tab Content */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
           {activeTab === 'users' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">User Management</h2>
-                  <p className="text-purple-300 mt-1">Manage user accounts and their application access</p>
-                </div>
-                <button
-                  onClick={() => setShowAddUserModal(true)}
-                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg"
-                >
-                  <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add User
-                </button>
-              </div>
-
-              {/* Search bar */}
-              <div className="mb-6">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg className="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search users by name or email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Users table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">User</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Status</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Applications</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Last Login</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.map((u) => (
-                      <tr key={u.user_id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="py-4 px-4">
-                          <div className="flex items-center space-x-3">
-                            {u.profile_picture ? (
-                              <img
-                                src={u.profile_picture}
-                                alt={u.name}
-                                className="h-10 w-10 rounded-full ring-2 ring-purple-500/50"
-                              />
-                            ) : (
-                              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ring-2 ring-purple-500/50">
-                                <span className="text-white font-bold text-sm">
-                                  {u.name.charAt(0).toUpperCase()}
-                                </span>
-                              </div>
-                            )}
-                            <div>
-                              <div className="text-white font-medium">{u.name}</div>
-                              <div className="text-purple-400 text-sm">{u.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <button
-                            onClick={() => toggleUserStatus(u.user_id, u.is_active)}
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                              u.is_active
-                                ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30'
-                                : 'bg-red-500/20 text-red-300 hover:bg-red-500/30'
-                            }`}
-                          >
-                            <span className={`h-2 w-2 rounded-full mr-2 ${u.is_active ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                            {u.is_active ? 'Active' : 'Inactive'}
-                          </button>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex flex-wrap gap-2">
-                            {u.apps.length === 0 ? (
-                              <span className="text-purple-400 text-sm">No apps assigned</span>
-                            ) : (
-                              u.apps.map((app) => (
-                                <div
-                                  key={app.app_id}
-                                  className="inline-flex items-center bg-white/5 border border-white/10 rounded-lg px-2 py-1"
-                                >
-                                  <span className="text-white text-xs font-medium">{app.app_name}</span>
-                                  <span className="mx-1 text-purple-400 text-xs">·</span>
-                                  <span className={`text-xs ${
-                                    app.role_code === 'admin' ? 'text-red-300' :
-                                    app.role_code === 'editor' ? 'text-blue-300' :
-                                    'text-gray-300'
-                                  }`}>
-                                    {app.role_name}
-                                  </span>
-                                  <button
-                                    onClick={() => removeAppAccess(u.user_id, app.app_id)}
-                                    className="ml-2 text-red-400 hover:text-red-300 transition-colors"
-                                  >
-                                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              ))
-                            )}
-                            <button
-                              onClick={() => {
-                                setSelectedUser(u);
-                                setShowAssignModal(true);
-                              }}
-                              className="inline-flex items-center px-2 py-1 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-purple-300 text-xs transition-colors"
-                            >
-                              <svg className="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                              </svg>
-                              Assign
-                            </button>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className="text-purple-300 text-sm">
-                            {u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <button
-                            onClick={() => toggleUserStatus(u.user_id, u.is_active)}
-                            className="text-purple-400 hover:text-purple-300 transition-colors"
-                          >
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {filteredUsers.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-full mb-4">
-                    <svg className="h-8 w-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">No users found</h3>
-                  <p className="text-purple-300">Try adjusting your search query</p>
-                </div>
-              )}
-            </div>
+            <UserTable
+              filteredUsers={filteredUsers}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              toggleUserStatus={toggleUserStatus}
+              removeAppAccess={removeAppAccess}
+              setSelectedUser={setSelectedUser}
+              setShowAssignModal={setShowAssignModal}
+              setShowAddUserModal={setShowAddUserModal}
+            />
           )}
-
-          {activeTab === 'apps' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-white">Application Management</h2>
-                <p className="text-purple-300 mt-1">View and manage applications in the SSO portal</p>
-              </div>
-
-              {/* Applications table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Application</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Code</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">URL</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Users</th>
-                      <th className="text-left py-4 px-4 text-sm font-semibold text-purple-300">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {applications.map((app) => (
-                      <tr key={app.app_id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                        <td className="py-4 px-4">
-                          <div>
-                            <div className="text-white font-medium">{app.app_name}</div>
-                            <div className="text-purple-400 text-sm">{app.app_description}</div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className="inline-flex items-center px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-purple-300 text-xs font-mono">
-                            {app.app_code}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4">
-                          <a
-                            href={app.app_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-purple-400 hover:text-purple-300 text-sm underline"
-                          >
-                            {app.app_url}
-                          </a>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center">
-                            <svg className="h-4 w-4 text-purple-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                            <span className="text-white font-medium">{app.user_count}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            app.is_active
-                              ? 'bg-green-500/20 text-green-300'
-                              : 'bg-red-500/20 text-red-300'
-                          }`}>
-                            <span className={`h-2 w-2 rounded-full mr-2 ${app.is_active ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                            {app.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {applications.length === 0 && (
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/20 rounded-full mb-4">
-                    <svg className="h-8 w-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">No applications found</h3>
-                  <p className="text-purple-300">No applications are registered in the system</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'roles' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">Roles & Permissions</h2>
-                  <p className="text-purple-300 mt-1">Configure user roles and access permissions</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-red-500/10 to-pink-500/10 backdrop-blur-sm rounded-xl border border-red-500/20 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
-                      <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                    </div>
-                    <span className="text-2xl font-bold text-white">👑</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Administrator</h3>
-                  <p className="text-red-200 text-sm mb-4">Full access to all features and user management</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-red-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Full read/write access
-                    </div>
-                    <div className="flex items-center text-sm text-red-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      User management
-                    </div>
-                    <div className="flex items-center text-sm text-red-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      System configuration
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-sm rounded-xl border border-blue-500/20 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                      <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </div>
-                    <span className="text-2xl font-bold text-white">✏️</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Editor</h3>
-                  <p className="text-blue-200 text-sm mb-4">Can view and edit data within applications</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-blue-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Read access
-                    </div>
-                    <div className="flex items-center text-sm text-blue-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Write access
-                    </div>
-                    <div className="flex items-center text-sm text-blue-200">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Data modification
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-gray-500/10 to-gray-600/10 backdrop-blur-sm rounded-xl border border-gray-500/20 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="h-12 w-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center">
-                      <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </div>
-                    <span className="text-2xl font-bold text-white">👁️</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Viewer</h3>
-                  <p className="text-gray-300 text-sm mb-4">Read-only access to application data</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-300">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Read-only access
-                    </div>
-                    <div className="flex items-center text-sm text-gray-300">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      View reports
-                    </div>
-                    <div className="flex items-center text-sm text-gray-300">
-                      <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Export data
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === 'apps' && <AppList applications={applications} />}
+          {activeTab === 'roles' && <RolesView />}
         </div>
       </main>
 
-      {/* Add User Modal */}
-      {showAddUserModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-2xl border border-white/10 max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-xl font-bold text-white">Add New User</h3>
-                <p className="text-purple-300 text-sm mt-1">Create a new user account manually</p>
-              </div>
-              <button
-                onClick={() => setShowAddUserModal(false)}
-                className="text-purple-400 hover:text-white transition-colors"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+      <AddUserModal
+        show={showAddUserModal}
+        onClose={() => setShowAddUserModal(false)}
+        onSubmit={handleAddUser}
+      />
 
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const email = formData.get('email') as string;
-                const name = formData.get('name') as string;
-
-                try {
-                  await apiService.createUser(email, name);
-                  setShowAddUserModal(false);
-                  (e.target as HTMLFormElement).reset();
-                  // Reload users after modal is closed
-                  await loadUsers();
-                } catch (error) {
-                  console.error('Failed to create user:', error);
-                  alert('Failed to create user. Email may already exist.');
-                }
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-medium text-purple-300 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="user@example.com"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-purple-300 mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  placeholder="John Doe"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <div className="flex items-start">
-                  <svg className="h-5 w-5 text-blue-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <p className="text-sm text-blue-300">
-                      The user will be created but won't have access to any applications yet. After creation, use the "Assign" button to grant application access.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddUserModal(false)}
-                  className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg"
-                >
-                  Create User
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Assign App Role Modal */}
-      {showAssignModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-2xl border border-white/10 max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-xl font-bold text-white">Assign Application</h3>
-                <p className="text-purple-300 text-sm mt-1">Assign {selectedUser.name} to an application</p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowAssignModal(false);
-                  setSelectedUser(null);
-                }}
-                className="text-purple-400 hover:text-white transition-colors"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const appId = formData.get('app_id') as string;
-                const roleId = formData.get('role_id') as string;
-
-                try {
-                  await apiService.assignAppRole(selectedUser.user_id, appId, roleId);
-                  await loadUsers();
-                  setShowAssignModal(false);
-                  setSelectedUser(null);
-                } catch (error) {
-                  console.error('Failed to assign app role:', error);
-                  alert('Failed to assign app role');
-                }
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-medium text-purple-300 mb-2">
-                  Application
-                </label>
-                <select
-                  name="app_id"
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">Select an application</option>
-                  {applications.map((app) => (
-                    <option key={app.app_id} value={app.app_id} className="bg-slate-800">
-                      {app.app_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-purple-300 mb-2">
-                  Role
-                </label>
-                <select
-                  name="role_id"
-                  required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="">Select a role</option>
-                  {roles.map((role) => (
-                    <option key={role.role_id} value={role.role_id} className="bg-slate-800">
-                      {role.role_name} - {role.role_description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAssignModal(false);
-                    setSelectedUser(null);
-                  }}
-                  className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg"
-                >
-                  Assign
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <AssignRoleModal
+        show={showAssignModal}
+        onClose={() => {
+          setShowAssignModal(false);
+          setSelectedUser(null);
+        }}
+        selectedUser={selectedUser}
+        applications={applications}
+        roles={roles}
+        onSubmit={handleAssignRole}
+      />
     </div>
   );
 }

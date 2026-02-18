@@ -19,12 +19,14 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 
     req.user = payload;
     next();
-  } catch (error: any) {
-    logger.error(`Auth error for ${req.path}:`, error.message);
-    if (error.name === 'TokenExpiredError') {
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    const name = error instanceof Error ? error.name : '';
+    logger.error(`Auth error for ${req.path}:`, msg);
+    if (name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
     }
-    if (error.message === 'Token has been revoked' || error.message === 'Token has been superseded') {
+    if (msg === 'Token has been revoked' || msg === 'Token has been superseded') {
       return res.status(401).json({ error: 'Token has been revoked' });
     }
     return res.status(401).json({ error: 'Invalid token' });

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { logger } from '../config/logger';
+import { logAudit } from '../utils/auditLog';
+import type { User } from '../types';
 
 export class AuthController {
   // POST /api/auth/google - Google OAuth login
@@ -34,6 +36,8 @@ export class AuthController {
 
       logger.info(`User logged in: ${user.email}`);
 
+      await logAudit(user.user_id, 'LOGIN', { method: 'google' }, req.ip || 'unknown');
+
       res.json({
         success: true,
         data: {
@@ -49,7 +53,7 @@ export class AuthController {
           apps: details,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Google login error:', error);
       res.status(500).json({ success: false, error: 'Authentication failed' });
     }
@@ -89,8 +93,8 @@ export class AuthController {
           apps: payload.apps,
         },
       });
-    } catch (error: any) {
-      if (error.name === 'TokenExpiredError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'TokenExpiredError') {
         return res.status(401).json({ success: false, error: 'Token expired' });
       }
       res.status(401).json({ success: false, error: 'Invalid token' });
@@ -108,8 +112,10 @@ export class AuthController {
 
       logger.info(`User logged out: ${req.user.email}`);
 
+      await logAudit(req.user.sub, 'LOGOUT', {}, req.ip || 'unknown');
+
       res.json({ success: true, message: 'Logged out successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Logout error:', error);
       res.status(500).json({ success: false, error: 'Logout failed' });
     }
@@ -134,7 +140,7 @@ export class AuthController {
           apps: req.user.apps,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       res.status(500).json({ success: false, error: 'Failed to get user info' });
     }
   }
@@ -151,12 +157,7 @@ export class AuthController {
 
       // Generate new tokens with updated permissions
       const { accessToken, refreshToken } = AuthService.generateTokens(
-        {
-          user_id: req.user.sub,
-          email: req.user.email,
-          name: req.user.name,
-          profile_picture: req.user.picture,
-        } as any,
+        { user_id: req.user.sub, email: req.user.email, name: req.user.name, profile_picture: req.user.picture } as User,
         apps
       );
 
@@ -173,7 +174,7 @@ export class AuthController {
           apps,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Token refresh error:', error);
       res.status(500).json({ success: false, error: 'Token refresh failed' });
     }

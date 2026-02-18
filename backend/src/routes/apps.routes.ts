@@ -15,7 +15,7 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
       success: true,
       data: result.rows,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: 'Failed to fetch applications', message: 'Internal server error' });
   }
 });
@@ -50,7 +50,7 @@ router.get('/my', authenticate, async (req: AuthRequest, res) => {
       success: true,
       data: result.rows,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({ error: 'Failed to fetch user applications', message: 'Internal server error' });
   }
 });

@@ -1,9 +1,22 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { logger } from '../config/logger';
 import { query } from '../config/database';
 import { redisClient } from '../config/redis';
 import { TokenPayload, User } from '../types';
+
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+interface GoogleUserData {
+  google_id: string;
+  email: string;
+  name: string;
+  picture?: string;
+  email_verified: boolean;
+}
 
 if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
   logger.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET environment variables are required');
@@ -38,7 +51,7 @@ export class AuthService {
   }
 
   // Find or create user from Google OAuth
-  static async findOrCreateUser(googleData: any): Promise<User> {
+  static async findOrCreateUser(googleData: GoogleUserData): Promise<User> {
     // Check if user exists
     let result = await query(
       'SELECT * FROM users WHERE google_id = $1 OR email = $2',
@@ -59,7 +72,7 @@ export class AuthService {
     result = await query(
       `INSERT INTO users (email, name, google_id, profile_picture, is_email_verified)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [googleData.email, googleData.name, googleData.google_id, googleData.picture, googleData.email_verified]
+      [googleData.email, googleData.name, googleData.google_id, googleData.picture || null, googleData.email_verified]
     );
 
     return result.rows[0];
@@ -115,11 +128,11 @@ export class AuthService {
     const tokenKey = `token:${userId}`;
     await redisClient.setEx(tokenKey, 7 * 24 * 60 * 60, JSON.stringify({ accessToken, refreshToken }));
 
-    // Also store in database for audit
+    // Store hashed tokens in database for audit (never store raw JWTs)
     await query(
       `INSERT INTO auth_tokens (user_id, access_token, refresh_token, expires_at)
        VALUES ($1, $2, $3, NOW() + INTERVAL '7 days')`,
-      [userId, accessToken, refreshToken]
+      [userId, hashToken(accessToken), hashToken(refreshToken)]
     );
   }
 
