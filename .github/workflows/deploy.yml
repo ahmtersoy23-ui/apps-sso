@@ -72,6 +72,10 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          JWT_SECRET: test-jwt-secret-for-ci-pipeline-only
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret-for-ci-pipeline-only
+          NODE_ENV: test
 
       - name: Build
         run: npm run build

@@ -25,8 +25,8 @@ export default function DashboardPage() {
       if (response.success) {
         setApps(response.data);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load applications');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load applications');
     } finally {
       setLoading(false);
     }
@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     try {
       await apiService.logout();
-    } catch (error) {
+    } catch {
       // logout failed silently
     } finally {
       authService.logout();
@@ -118,7 +118,7 @@ export default function DashboardPage() {
           window.open(url.toString(), '_blank');
         }
       }
-    } catch (error) {
+    } catch {
       // token refresh failed, use existing token
       const accessToken = authService.getAccessToken();
       if (accessToken) {

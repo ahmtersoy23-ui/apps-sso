@@ -65,7 +65,7 @@ class AuthService {
       }
 
       return false;
-    } catch (error) {
+    } catch {
       // token refresh failed
       this.logout();
       return false;
