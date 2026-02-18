@@ -9,7 +9,8 @@
 \c apps_db
 
 -- 3. Create SSO user
-CREATE USER apps_sso WITH ENCRYPTED PASSWORD 'IWA_Apps_2026_Secure!';
+-- IMPORTANT: Change password before running in production!
+CREATE USER apps_sso WITH ENCRYPTED PASSWORD 'CHANGE_ME';
 GRANT CONNECT ON DATABASE apps_db TO apps_sso;
 
 -- 4. Users Table

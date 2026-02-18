@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import { logger } from '../config/logger';
 import { query } from '../config/database';
 import { redisClient } from '../config/redis';
 import { TokenPayload, User } from '../types';
 
 if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-  console.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET environment variables are required');
+  logger.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET environment variables are required');
   process.exit(1);
 }
 

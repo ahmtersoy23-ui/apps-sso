@@ -104,17 +104,16 @@ export default function DashboardPage() {
         const { accessToken, refreshToken } = refreshResponse.data;
         authService.setTokens(accessToken, refreshToken);
 
-        // Send token via query param (for server-side middleware like Next.js)
-        // and hash (for client-side SPAs - more secure, not sent in HTTP requests)
+        // SECURITY: Token sent via hash fragment only (not sent to server in HTTP requests)
+        // TODO: Migrate to proper SSO flow where apps call /api/auth/verify endpoint
+        // instead of receiving token directly
         const url = new URL(appUrl);
-        url.searchParams.set('token', accessToken);
         url.hash = `token=${accessToken}`;
         window.open(url.toString(), '_blank');
       } else {
         const accessToken = authService.getAccessToken();
         if (accessToken) {
           const url = new URL(appUrl);
-          url.searchParams.set('token', accessToken);
           url.hash = `token=${accessToken}`;
           window.open(url.toString(), '_blank');
         }
@@ -124,7 +123,6 @@ export default function DashboardPage() {
       const accessToken = authService.getAccessToken();
       if (accessToken) {
         const url = new URL(appUrl);
-        url.searchParams.set('token', accessToken);
         url.hash = `token=${accessToken}`;
         window.open(url.toString(), '_blank');
       }

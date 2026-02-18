@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import dotenv from 'dotenv';
+import { logger } from './logger';
 
 dotenv.config();
 
@@ -11,8 +12,8 @@ export const redisClient = createClient({
   password: process.env.REDIS_PASSWORD || undefined,
 });
 
-redisClient.on('error', (err) => console.error('Redis Client Error', err));
-redisClient.on('connect', () => console.log('✅ Redis connected'));
+redisClient.on('error', (err) => logger.error('Redis Client Error', err));
+redisClient.on('connect', () => logger.info('✅ Redis connected'));
 
 export const connectRedis = async () => {
   if (!redisClient.isOpen) {

@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { logger } from './logger';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ export const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Database pool error:', err.message);
+  logger.error('Database pool error:', err.message);
   process.exit(-1);
 });
 
@@ -25,7 +26,7 @@ export const query = async (text: string, params?: any[]) => {
   const duration = Date.now() - start;
   // Only log slow queries in production; avoid logging full SQL text
   if (duration > 500) {
-    console.warn('Slow query', { duration, rows: res.rowCount });
+    logger.warn('Slow query', { duration, rows: res.rowCount });
   }
   return res;
 };
