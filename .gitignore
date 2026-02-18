@@ -6,6 +6,8 @@ build
 .env
 .env.*
 !.env.example
+.env.production.backup
+*.backup
 
 # Logs
 *.log
