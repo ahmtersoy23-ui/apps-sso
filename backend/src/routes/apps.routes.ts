@@ -5,7 +5,7 @@ import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 const router = Router();
 
 // GET /api/apps - List all applications
-router.get('/', authenticate, async (req: AuthRequest, res) => {
+router.get('/', authenticate, async (_req: AuthRequest, res) => {
   try {
     const result = await query(
       'SELECT app_id, app_code, app_name, app_description, app_url, app_icon FROM applications WHERE is_active = true ORDER BY app_name'
