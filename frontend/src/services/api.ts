@@ -22,7 +22,7 @@ class ApiService {
     const response = await fetch(`${API_URL}/auth/google`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ token: googleToken }),
+      body: JSON.stringify({ credential: googleToken }),
     });
 
     if (!response.ok) {
