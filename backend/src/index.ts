@@ -17,7 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+}));
 app.use(compression());
 app.use(cors({
   origin: process.env.ALLOWED_ORIGINS?.split(',') || [],
