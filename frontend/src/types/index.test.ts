@@ -6,8 +6,6 @@ import type {
   LoginResponse,
   ApiResponse,
   AdminUser,
-  AdminUserApp,
-  AdminApplication,
   Role,
 } from './index';
 

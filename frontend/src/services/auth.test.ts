@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { authService } from './auth';
+import type { User } from '../types';
 
 // Mock jwt-decode
 vi.mock('jwt-decode', () => ({
@@ -66,7 +67,7 @@ describe('AuthService', () => {
         name: 'Test User',
         apps: { stockpulse: 'editor' },
       };
-      authService.setUser(user as any);
+      authService.setUser(user as unknown as User);
       expect(authService.getUser()).toEqual(user);
     });
 
@@ -132,7 +133,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         name: 'Test User',
         apps: {},
-      } as any);
+      } as unknown as User);
 
       authService.logout();
 
