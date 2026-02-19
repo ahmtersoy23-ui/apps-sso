@@ -9,14 +9,14 @@ export class AuthController {
   // POST /api/auth/google - Google OAuth login
   static async googleLogin(req: Request, res: Response) {
     try {
-      const { token } = req.body;
+      const { credential } = req.body;
 
-      if (!token || typeof token !== 'string') {
+      if (!credential || typeof credential !== 'string') {
         return res.status(400).json({ success: false, error: 'Google token is required' });
       }
 
       // Verify Google token
-      const googleData = await AuthService.verifyGoogleToken(token);
+      const googleData = await AuthService.verifyGoogleToken(credential);
 
       // Find or create user
       const user = await AuthService.findOrCreateUser(googleData);
