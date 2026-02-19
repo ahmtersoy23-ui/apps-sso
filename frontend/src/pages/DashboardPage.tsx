@@ -58,17 +58,14 @@ export default function DashboardPage() {
         const { accessToken, refreshToken } = refreshResponse.data;
         authService.setTokens(accessToken, refreshToken);
 
-        // SECURITY: Token sent via hash fragment only (not sent to server in HTTP requests)
-        // TODO: Migrate to proper SSO flow where apps call /api/auth/verify endpoint
-        // instead of receiving token directly
         const url = new URL(appUrl);
-        url.hash = `token=${accessToken}`;
+        url.searchParams.set('token', accessToken);
         window.open(url.toString(), '_blank');
       } else {
         const accessToken = authService.getAccessToken();
         if (accessToken) {
           const url = new URL(appUrl);
-          url.hash = `token=${accessToken}`;
+          url.searchParams.set('token', accessToken);
           window.open(url.toString(), '_blank');
         }
       }
@@ -77,7 +74,7 @@ export default function DashboardPage() {
       const accessToken = authService.getAccessToken();
       if (accessToken) {
         const url = new URL(appUrl);
-        url.hash = `token=${accessToken}`;
+        url.searchParams.set('token', accessToken);
         window.open(url.toString(), '_blank');
       }
     }
