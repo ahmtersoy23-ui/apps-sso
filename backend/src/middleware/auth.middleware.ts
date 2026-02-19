@@ -22,7 +22,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     const name = error instanceof Error ? error.name : '';
-    logger.error(`Auth error for ${req.path}:`, msg);
+    logger.error(`Auth error for ${req.path}: ${msg}`);
     if (name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
     }

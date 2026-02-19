@@ -114,5 +114,5 @@ jobs:
           port: 2222
           script: |
             cd /var/www/apps-sso/backend
-            npm ci --production
+            npm ci --omit=dev
             pm2 restart apps-sso-backend

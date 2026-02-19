@@ -16,6 +16,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust first proxy (nginx) — required for rate limiting & correct req.ip
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet({
   crossOriginOpenerPolicy: { policy: 'unsafe-none' },
