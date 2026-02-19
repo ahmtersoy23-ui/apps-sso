@@ -35,6 +35,8 @@ jobs:
         run: npm run build
         env:
           CI: false
+          VITE_API_URL: https://apps.iwa.web.tr/api
+          VITE_GOOGLE_CLIENT_ID: 382293300172-v5kjfmedm1gn2u99ngtnj3g9v8pfbna7.apps.googleusercontent.com
 
       - name: Clean old frontend files
         uses: appleboy/ssh-action@v1.0.3
