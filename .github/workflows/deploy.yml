@@ -36,14 +36,17 @@ jobs:
         env:
           CI: false
 
-      - name: Clean old frontend assets
+      - name: Clean old frontend files
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 2222
-          script: rm -rf /var/www/apps-sso-frontend/assets/*
+          script: |
+            rm -rf /var/www/html/apps/assets
+            rm -f /var/www/html/apps/index.html
+            rm -f /var/www/html/apps/vite.svg
 
       - name: Deploy frontend
         uses: appleboy/scp-action@v0.1.7
@@ -53,7 +56,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 2222
           source: "frontend/dist/*"
-          target: "/var/www/apps-sso-frontend"
+          target: "/var/www/html/apps"
           strip_components: 2
 
   deploy-backend:
