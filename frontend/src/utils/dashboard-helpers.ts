@@ -22,6 +22,7 @@ export const getAppIcon = (appCode: string): string | null => {
     'swiftstock': '/icons/swiftstock.svg',
     'shipmate': '/icons/shipmate.svg',
     'fundmate': '/icons/fundmate.svg',
+    'databridge': '/icons/databridge.svg',
   };
   return icons[appCode.toLowerCase()] || null;
 };
