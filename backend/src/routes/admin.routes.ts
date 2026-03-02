@@ -7,6 +7,7 @@ import {
   updateUserStatusSchema,
   assignAppRoleSchema,
   uuidParamSchema,
+  userAppParamSchema,
 } from '../validation/schemas';
 
 const router = Router();
@@ -20,7 +21,7 @@ router.get('/users', AdminController.getUsers);
 router.post('/users', validateBody(createUserSchema), AdminController.createUser);
 router.patch('/users/:userId/status', validateParams(uuidParamSchema), validateBody(updateUserStatusSchema), AdminController.toggleUserStatus);
 router.post('/users/:userId/apps', validateParams(uuidParamSchema), validateBody(assignAppRoleSchema), AdminController.assignAppRole);
-router.delete('/users/:userId/apps/:appId', validateParams(uuidParamSchema), AdminController.removeAppAccess);
+router.delete('/users/:userId/apps/:appId', validateParams(userAppParamSchema), AdminController.removeAppAccess);
 
 // Applications management
 router.get('/applications', AdminController.getApplications);

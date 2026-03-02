@@ -54,6 +54,11 @@ export const uuidParamSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
 }).strict();
 
+export const userAppParamSchema = z.object({
+  userId: z.string().uuid('Invalid user ID'),
+  appId: z.string().uuid('Invalid app ID'),
+}).strict();
+
 export const appCodeParamSchema = z.object({
   appCode: z.string().min(1, 'Invalid app code'),
 }).strict();
