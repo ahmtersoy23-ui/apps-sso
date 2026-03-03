@@ -38,8 +38,8 @@ export const updateUserStatusSchema = z.object({
 // ============================================
 
 export const assignAppRoleSchema = z.object({
-  appId: z.string().uuid('Invalid app ID'),
-  roleId: z.string().uuid('Invalid role ID'),
+  app_id: z.string().uuid('Invalid app ID'),
+  role_id: z.string().uuid('Invalid role ID'),
 }).strict();
 
 export const removeAppRoleSchema = z.object({

@@ -172,27 +172,27 @@ describe('assignAppRoleSchema', () => {
   const validUUID = '550e8400-e29b-41d4-a716-446655440000';
 
   it('should accept valid UUIDs', () => {
-    expect(assignAppRoleSchema.safeParse({ appId: validUUID, roleId: validUUID }).success).toBe(true);
+    expect(assignAppRoleSchema.safeParse({ app_id: validUUID, role_id: validUUID }).success).toBe(true);
   });
 
-  it('should reject invalid appId', () => {
-    expect(assignAppRoleSchema.safeParse({ appId: 'not-uuid', roleId: validUUID }).success).toBe(false);
+  it('should reject invalid app_id', () => {
+    expect(assignAppRoleSchema.safeParse({ app_id: 'not-uuid', role_id: validUUID }).success).toBe(false);
   });
 
-  it('should reject invalid roleId', () => {
-    expect(assignAppRoleSchema.safeParse({ appId: validUUID, roleId: 'bad' }).success).toBe(false);
+  it('should reject invalid role_id', () => {
+    expect(assignAppRoleSchema.safeParse({ app_id: validUUID, role_id: 'bad' }).success).toBe(false);
   });
 
-  it('should reject missing appId', () => {
-    expect(assignAppRoleSchema.safeParse({ roleId: validUUID }).success).toBe(false);
+  it('should reject missing app_id', () => {
+    expect(assignAppRoleSchema.safeParse({ role_id: validUUID }).success).toBe(false);
   });
 
-  it('should reject missing roleId', () => {
-    expect(assignAppRoleSchema.safeParse({ appId: validUUID }).success).toBe(false);
+  it('should reject missing role_id', () => {
+    expect(assignAppRoleSchema.safeParse({ app_id: validUUID }).success).toBe(false);
   });
 
   it('should reject extra fields (strict)', () => {
-    expect(assignAppRoleSchema.safeParse({ appId: validUUID, roleId: validUUID, extra: true }).success).toBe(false);
+    expect(assignAppRoleSchema.safeParse({ app_id: validUUID, role_id: validUUID, extra: true }).success).toBe(false);
   });
 });
 
