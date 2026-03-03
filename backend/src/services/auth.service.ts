@@ -141,6 +141,19 @@ export class AuthService {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   }
 
+  // Verify JWT token for cross-app access (signature + revocation, no supersession check)
+  // Used by /api/auth/verify so that multiple concurrent app sessions don't break each other
+  static async verifyTokenForAppAccess(token: string): Promise<TokenPayload> {
+    const payload = jwt.verify(token, JWT_SECRET) as TokenPayload;
+
+    const isRevoked = await redisClient.get(`revoked:${payload.sub}`);
+    if (isRevoked) {
+      throw new Error('Token has been revoked');
+    }
+
+    return payload;
+  }
+
   // Verify JWT token with revocation check (for protected routes on SSO portal itself)
   static async verifyTokenWithRevocationCheck(token: string): Promise<TokenPayload> {
     const payload = jwt.verify(token, JWT_SECRET) as TokenPayload;

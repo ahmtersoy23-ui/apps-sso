@@ -19,6 +19,17 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
+
+      // Refresh token on load to pick up any permission changes since last login
+      try {
+        const refreshResponse = await apiService.refreshAccessToken();
+        if (refreshResponse.success) {
+          authService.setTokens(refreshResponse.data.accessToken, refreshResponse.data.refreshToken);
+        }
+      } catch {
+        // Continue with existing token if refresh fails
+      }
+
       const userData = authService.getUser();
       setUser(userData);
 

@@ -5,7 +5,6 @@ import { validateBody } from '../middleware/validate';
 import {
   googleLoginSchema,
   verifyTokenSchema,
-  refreshTokenSchema,
 } from '../validation/schemas';
 
 const router = Router();
@@ -17,6 +16,6 @@ router.post('/verify', validateBody(verifyTokenSchema), AuthController.verifyTok
 // Protected routes
 router.post('/logout', authenticate, AuthController.logout);
 router.get('/me', authenticate, AuthController.me);
-router.post('/refresh-token', authenticate, validateBody(refreshTokenSchema), AuthController.refreshToken);
+router.post('/refresh-token', authenticate, AuthController.refreshToken);
 
 export default router;

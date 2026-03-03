@@ -72,8 +72,8 @@ export class AuthController {
         return res.status(400).json({ success: false, error: 'Invalid app_code' });
       }
 
-      // Verify token signature + revocation check
-      const payload = await AuthService.verifyTokenWithRevocationCheck(token);
+      // Verify token for app access (signature + revocation, no supersession check)
+      const payload = await AuthService.verifyTokenForAppAccess(token);
 
       // Check if user has access to the requested app
       if (app_code && !payload.apps[app_code]) {
