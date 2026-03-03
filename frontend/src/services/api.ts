@@ -135,6 +135,20 @@ class ApiService {
     return response.json();
   }
 
+  async deleteUser(userId: string): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete user');
+    }
+
+    return response.json();
+  }
+
   async removeAppAccess(userId: string, appId: string): Promise<ApiResponse<void>> {
     const response = await fetch(`${API_URL}/admin/users/${userId}/apps/${appId}`, {
       method: 'DELETE',

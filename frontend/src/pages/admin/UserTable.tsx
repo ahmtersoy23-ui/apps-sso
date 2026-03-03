@@ -6,6 +6,7 @@ interface UserTableProps {
   setSearchQuery: (query: string) => void;
   toggleUserStatus: (userId: string, currentStatus: boolean) => void;
   removeAppAccess: (userId: string, appId: string) => void;
+  deleteUser: (userId: string, userEmail: string) => void;
   setSelectedUser: (user: AdminUser) => void;
   setShowAssignModal: (show: boolean) => void;
   setShowAddUserModal: (show: boolean) => void;
@@ -17,6 +18,7 @@ export default function UserTable({
   setSearchQuery,
   toggleUserStatus,
   removeAppAccess,
+  deleteUser,
   setSelectedUser,
   setShowAssignModal,
   setShowAddUserModal,
@@ -157,11 +159,12 @@ export default function UserTable({
                 </td>
                 <td className="py-4 px-4">
                   <button
-                    onClick={() => toggleUserStatus(u.user_id, u.is_active)}
-                    className="text-purple-400 hover:text-purple-300 transition-colors"
+                    onClick={() => deleteUser(u.user_id, u.email)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                    title="Delete user"
                   >
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </td>

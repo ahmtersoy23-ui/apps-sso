@@ -97,6 +97,18 @@ export default function AdminPage() {
     }
   };
 
+  const deleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`"${userEmail}" kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`)) {
+      return;
+    }
+    try {
+      await apiService.deleteUser(userId);
+      await loadUsers();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to delete user');
+    }
+  };
+
   const handleAddUser = async (email: string, name: string) => {
     await apiService.createUser(email, name);
     setShowAddUserModal(false);
@@ -265,6 +277,7 @@ export default function AdminPage() {
               setSearchQuery={setSearchQuery}
               toggleUserStatus={toggleUserStatus}
               removeAppAccess={removeAppAccess}
+              deleteUser={deleteUser}
               setSelectedUser={setSelectedUser}
               setShowAssignModal={setShowAssignModal}
               setShowAddUserModal={setShowAddUserModal}

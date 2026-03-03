@@ -175,6 +175,50 @@ export class AdminController {
     }
   }
 
+  // DELETE /api/admin/users/:userId - Delete user permanently
+  static async deleteUser(req: AuthRequest, res: Response) {
+    try {
+      if (!isAdmin(req)) {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+
+      const { userId } = req.params;
+      if (!isValidUUID(userId)) {
+        return res.status(400).json({ error: 'Invalid user ID format' });
+      }
+
+      // Prevent self-deletion
+      if (userId === req.user!.sub) {
+        return res.status(400).json({ error: 'Cannot delete your own account' });
+      }
+
+      const existing = await pool.query('SELECT user_id, email FROM users WHERE user_id = $1', [userId]);
+      if (existing.rows.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const targetEmail = existing.rows[0].email;
+
+      // Delete in order: app roles, auth tokens, then user
+      await pool.query('DELETE FROM user_app_roles WHERE user_id = $1', [userId]);
+      await pool.query('DELETE FROM auth_tokens WHERE user_id = $1', [userId]);
+      await pool.query('DELETE FROM users WHERE user_id = $1', [userId]);
+
+      // Revoke any active Redis tokens
+      const { redisClient } = await import('../config/redis');
+      await redisClient.del(`token:${userId}`);
+      await redisClient.del(`revoked:${userId}`);
+
+      logger.info(`User deleted: ${targetEmail} (${userId}) by ${req.user!.email}`);
+      await logAudit(req.user!.sub, 'USER_DELETED', { targetUserId: userId, targetEmail }, req.ip || 'unknown');
+
+      res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error: unknown) {
+      logger.error('Delete user error:', error);
+      res.status(500).json({ error: 'Failed to delete user' });
+    }
+  }
+
   // GET /api/admin/applications - Get all applications
   static async getApplications(req: AuthRequest, res: Response) {
     try {
