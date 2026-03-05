@@ -1,10 +1,10 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
-import { logger } from '../config/logger';
 import { query } from '../config/database';
 import { redisClient } from '../config/redis';
 import { TokenPayload, User } from '../types';
+import { getSecret } from './secretsService';
 
 function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -17,14 +17,6 @@ interface GoogleUserData {
   picture?: string;
   email_verified: boolean;
 }
-
-if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-  logger.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET environment variables are required');
-  process.exit(1);
-}
-
-const JWT_SECRET: string = process.env.JWT_SECRET;
-const JWT_REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET;
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
@@ -113,8 +105,8 @@ export class AuthService {
       apps,
     };
 
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
-    const refreshToken = jwt.sign({ sub: user.user_id }, JWT_REFRESH_SECRET, {
+    const accessToken = jwt.sign(payload, getSecret('JWT_SECRET'), { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
+    const refreshToken = jwt.sign({ sub: user.user_id }, getSecret('JWT_REFRESH_SECRET'), {
       expiresIn: JWT_REFRESH_EXPIRES_IN,
     } as jwt.SignOptions);
 
@@ -138,13 +130,13 @@ export class AuthService {
 
   // Verify JWT token (signature only - for /verify endpoint called by other apps)
   static verifyToken(token: string): TokenPayload {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    return jwt.verify(token, getSecret('JWT_SECRET')) as TokenPayload;
   }
 
   // Verify JWT token for cross-app access (signature + revocation, no supersession check)
   // Used by /api/auth/verify so that multiple concurrent app sessions don't break each other
   static async verifyTokenForAppAccess(token: string): Promise<TokenPayload> {
-    const payload = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const payload = jwt.verify(token, getSecret('JWT_SECRET')) as TokenPayload;
 
     const isRevoked = await redisClient.get(`revoked:${payload.sub}`);
     if (isRevoked) {
@@ -156,7 +148,7 @@ export class AuthService {
 
   // Verify JWT token with revocation check (for protected routes on SSO portal itself)
   static async verifyTokenWithRevocationCheck(token: string): Promise<TokenPayload> {
-    const payload = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const payload = jwt.verify(token, getSecret('JWT_SECRET')) as TokenPayload;
 
     // Check if token is revoked in Redis
     const isRevoked = await redisClient.get(`revoked:${payload.sub}`);

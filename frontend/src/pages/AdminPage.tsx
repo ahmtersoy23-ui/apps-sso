@@ -6,12 +6,13 @@ import type { Application, AdminUser, AdminApplication, Role } from '../types';
 import UserTable from './admin/UserTable';
 import AppList from './admin/AppList';
 import RolesView from './admin/RolesView';
+import SecretsView from './admin/SecretsView';
 import AddUserModal from './admin/AddUserModal';
 import AssignRoleModal from './admin/AssignRoleModal';
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'roles'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'roles' | 'secrets'>('users');
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -264,6 +265,21 @@ export default function AdminPage() {
                   Roles & Permissions
                 </div>
               </button>
+              <button
+                onClick={() => setActiveTab('secrets')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'secrets'
+                    ? 'border-purple-500 text-white'
+                    : 'border-transparent text-purple-300 hover:text-white hover:border-white/20'
+                }`}
+              >
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  Güvenlik
+                </div>
+              </button>
             </nav>
           </div>
         </div>
@@ -285,6 +301,7 @@ export default function AdminPage() {
           )}
           {activeTab === 'apps' && <AppList applications={applications} />}
           {activeTab === 'roles' && <RolesView />}
+          {activeTab === 'secrets' && <SecretsView />}
         </div>
       </main>
 

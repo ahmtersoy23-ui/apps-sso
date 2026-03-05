@@ -10,6 +10,8 @@ import { logger } from './config/logger';
 import authRoutes from './routes/auth.routes';
 import appsRoutes from './routes/apps.routes';
 import adminRoutes from './routes/admin.routes';
+import secretsRoutes from './routes/secrets.routes';
+import { loadSecrets, getSecret } from './services/secretsService';
 
 dotenv.config();
 
@@ -83,6 +85,7 @@ app.get('/health', async (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/apps', appsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', secretsRoutes);
 
 // Error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -104,6 +107,15 @@ const startServer = async () => {
     // Test database connection
     await pool.query('SELECT NOW()');
     logger.info('✅ Database connected');
+
+    // Load JWT secrets from DB (overrides env if DB has rotated values)
+    await loadSecrets();
+
+    // Verify JWT secrets are available (from DB cache or env)
+    if (!getSecret('JWT_SECRET') || !getSecret('JWT_REFRESH_SECRET')) {
+      logger.error('FATAL: JWT_SECRET and JWT_REFRESH_SECRET are not available (check .env or DB)');
+      process.exit(1);
+    }
 
     app.listen(PORT, () => {
       logger.info(`🚀 IWA Apps SSO Server running on port ${PORT}`);

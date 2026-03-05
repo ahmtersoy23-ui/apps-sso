@@ -77,3 +77,29 @@ export interface Role {
   role_name: string;
   role_description: string;
 }
+
+export interface SystemSecret {
+  id: string;
+  secret_key: string;
+  version: number;
+  rotated_at: string | null;
+  rotated_by: string | null;
+  rotated_by_name: string | null;
+  has_previous: boolean;
+}
+
+export interface RotateSecretResponse {
+  secret_key: string;
+  version: number;
+  rotated_at: string;
+  new_value: string;
+  affected_apps: string[];
+  warning: string;
+}
+
+export interface RevertSecretResponse {
+  secret_key: string;
+  version: number;
+  reverted_at: string;
+  warning: string;
+}

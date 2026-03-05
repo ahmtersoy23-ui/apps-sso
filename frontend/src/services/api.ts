@@ -1,4 +1,4 @@
-import type { Application, LoginResponse, ApiResponse, AdminUser, AdminApplication, Role } from '../types';
+import type { Application, LoginResponse, ApiResponse, AdminUser, AdminApplication, Role, SystemSecret, RotateSecretResponse, RevertSecretResponse } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://apps.iwa.web.tr/api';
 
@@ -199,6 +199,43 @@ class ApiService {
       throw new Error('Failed to create user');
     }
 
+    return response.json();
+  }
+
+  // Secrets management
+  async getSecrets(): Promise<ApiResponse<SystemSecret[]>> {
+    const response = await fetch(`${API_URL}/admin/secrets`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch secrets');
+    return response.json();
+  }
+
+  async rotateSecret(key: string): Promise<ApiResponse<RotateSecretResponse>> {
+    const response = await fetch(`${API_URL}/admin/secrets/${key}/rotate`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || err.error || 'Failed to rotate secret');
+    }
+    return response.json();
+  }
+
+  async revertSecret(key: string): Promise<ApiResponse<RevertSecretResponse>> {
+    const response = await fetch(`${API_URL}/admin/secrets/${key}/revert`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || err.error || 'Failed to revert secret');
+    }
     return response.json();
   }
 }
