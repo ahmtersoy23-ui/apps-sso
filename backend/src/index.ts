@@ -48,7 +48,27 @@ const limiter = rateLimit({
     });
   },
 });
-app.use('/api/', limiter);
+// Apply general limiter to all /api/ routes EXCEPT /api/auth/verify (server-to-server internal call)
+app.use('/api/', (req, res, next) => {
+  if (req.path === '/auth/verify') return next();
+  return limiter(req, res, next);
+});
+
+// High-volume limiter for /api/auth/verify (server-to-server, all app servers share one IP)
+const verifyLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute window
+  max: 2000,           // 2000 req/min per IP (handles many concurrent users)
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests',
+      message: 'Too many requests from this IP, please try again later.',
+    });
+  },
+});
+app.use('/api/auth/verify', verifyLimiter);
 
 // Stricter rate limit for auth endpoints (10 requests per 15 minutes)
 const authLimiter = rateLimit({
