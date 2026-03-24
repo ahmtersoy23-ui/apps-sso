@@ -55,6 +55,16 @@ export default function DashboardPage() {
     }
   };
 
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  const navigateToApp = (url: string) => {
+    if (isMobile) {
+      window.location.href = url;
+    } else {
+      window.open(url, '_blank');
+    }
+  };
+
   const openApp = async (appUrl: string) => {
     // Validate URL before opening
     if (!isValidAppUrl(appUrl)) {
@@ -71,13 +81,13 @@ export default function DashboardPage() {
 
         const url = new URL(appUrl);
         url.searchParams.set('token', accessToken);
-        window.open(url.toString(), '_blank');
+        navigateToApp(url.toString());
       } else {
         const accessToken = authService.getAccessToken();
         if (accessToken) {
           const url = new URL(appUrl);
           url.searchParams.set('token', accessToken);
-          window.open(url.toString(), '_blank');
+          navigateToApp(url.toString());
         }
       }
     } catch {
@@ -86,7 +96,7 @@ export default function DashboardPage() {
       if (accessToken) {
         const url = new URL(appUrl);
         url.searchParams.set('token', accessToken);
-        window.open(url.toString(), '_blank');
+        navigateToApp(url.toString());
       }
     }
   };
