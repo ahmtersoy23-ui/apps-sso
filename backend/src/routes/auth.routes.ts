@@ -17,5 +17,6 @@ router.post('/verify', validateBody(verifyTokenSchema), AuthController.verifyTok
 router.post('/logout', authenticate, AuthController.logout);
 router.get('/me', authenticate, AuthController.me);
 router.post('/refresh-token', authenticate, AuthController.refreshToken);
+router.post('/log-app-open', authenticate, AuthController.logAppOpen);
 
 export default router;

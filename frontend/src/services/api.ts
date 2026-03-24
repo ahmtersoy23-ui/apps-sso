@@ -80,6 +80,18 @@ class ApiService {
     return response.json();
   }
 
+  async logAppOpen(appCode: string, appUrl: string): Promise<void> {
+    try {
+      await fetch(`${API_URL}/auth/log-app-open`, {
+        method: 'POST',
+        headers: this.getHeaders(true),
+        body: JSON.stringify({ app_code: appCode, app_url: appUrl }),
+      });
+    } catch {
+      // don't block navigation on log failure
+    }
+  }
+
   async getMyApps(): Promise<ApiResponse<Application[]>> {
     const response = await fetch(`${API_URL}/apps/my`, {
       method: 'GET',

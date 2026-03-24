@@ -70,7 +70,7 @@ export class SecretsController {
     try {
       const { newValue, version } = await rotateSecret(key as ManagedSecretKey, req.user!.sub);
 
-      await logAudit(req.user!.sub, 'SECRET_ROTATED', { secretKey: key, newVersion: version }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'SECRET_ROTATED', { secretKey: key, newVersion: version }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       logger.info(`Admin ${req.user!.email} rotated secret "${key}" to v${version}`);
 
@@ -108,7 +108,7 @@ export class SecretsController {
     try {
       const { version } = await revertSecret(key as ManagedSecretKey, req.user!.sub);
 
-      await logAudit(req.user!.sub, 'SECRET_REVERTED', { secretKey: key, newVersion: version }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'SECRET_REVERTED', { secretKey: key, newVersion: version }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({
         success: true,

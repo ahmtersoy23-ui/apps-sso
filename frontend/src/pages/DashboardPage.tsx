@@ -65,12 +65,15 @@ export default function DashboardPage() {
     }
   };
 
-  const openApp = async (appUrl: string) => {
+  const openApp = async (appCode: string, appUrl: string) => {
     // Validate URL before opening
     if (!isValidAppUrl(appUrl)) {
       // blocked: untrusted URL
       return;
     }
+
+    // Fire-and-forget: log which app user clicked
+    apiService.logAppOpen(appCode, appUrl);
 
     try {
       const refreshResponse = await apiService.refreshAccessToken();
@@ -108,7 +111,7 @@ export default function DashboardPage() {
   const renderCard = (app: Application, isToolCard: boolean = false) => (
     <div
       key={app.app_id}
-      onClick={() => openApp(app.app_url)}
+      onClick={() => openApp(app.app_code, app.app_url)}
       className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col cursor-pointer"
     >
       <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
@@ -153,7 +156,7 @@ export default function DashboardPage() {
         </div>
 
         <button
-          onClick={() => openApp(app.app_url)}
+          onClick={() => openApp(app.app_code, app.app_url)}
           className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70"
         >
           {isToolCard ? 'Open Tool' : 'Open Application'}

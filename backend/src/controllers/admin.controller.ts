@@ -87,7 +87,7 @@ export class AdminController {
       );
 
       logger.info(`User ${userId} status changed to ${is_active} by ${req.user!.email}`);
-      await logAudit(req.user!.sub, 'USER_STATUS_CHANGE', { targetUserId: userId, is_active }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'USER_STATUS_CHANGE', { targetUserId: userId, is_active }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({
         success: true,
@@ -132,7 +132,7 @@ export class AdminController {
       }
 
       logger.info(`App role assigned: user=${userId}, app=${app_id}, role=${role_id} by ${req.user!.email}`);
-      await logAudit(req.user!.sub, 'ROLE_ASSIGNMENT', { targetUserId: userId, appId: app_id, roleId: role_id }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'ROLE_ASSIGNMENT', { targetUserId: userId, appId: app_id, roleId: role_id }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({
         success: true,
@@ -163,7 +163,7 @@ export class AdminController {
       );
 
       logger.info(`App access removed: user=${userId}, app=${appId} by ${req.user!.email}`);
-      await logAudit(req.user!.sub, 'ROLE_REMOVAL', { targetUserId: userId, appId }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'ROLE_REMOVAL', { targetUserId: userId, appId }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({
         success: true,
@@ -210,7 +210,7 @@ export class AdminController {
       await redisClient.del(`revoked:${userId}`);
 
       logger.info(`User deleted: ${targetEmail} (${userId}) by ${req.user!.email}`);
-      await logAudit(req.user!.sub, 'USER_DELETED', { targetUserId: userId, targetEmail }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'USER_DELETED', { targetUserId: userId, targetEmail }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({ success: true, message: 'User deleted successfully' });
     } catch (error: unknown) {
@@ -304,7 +304,7 @@ export class AdminController {
       );
 
       logger.info(`User created manually: ${email} by ${req.user!.email}`);
-      await logAudit(req.user!.sub, 'USER_CREATED', { email, name: name.trim() }, req.ip || 'unknown');
+      await logAudit(req.user!.sub, 'USER_CREATED', { email, name: name.trim() }, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({
         success: true,

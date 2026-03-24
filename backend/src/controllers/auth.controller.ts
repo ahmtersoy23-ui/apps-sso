@@ -36,7 +36,8 @@ export class AuthController {
 
       logger.info(`User logged in: ${user.email}`);
 
-      await logAudit(user.user_id, 'LOGIN', { method: 'google' }, req.ip || 'unknown');
+      const ua = req.headers['user-agent'] || '';
+      await logAudit(user.user_id, 'LOGIN', { method: 'google' }, req.ip || 'unknown', ua);
 
       res.json({
         success: true,
@@ -80,6 +81,13 @@ export class AuthController {
         return res.status(403).json({ success: false, error: 'No access to this application' });
       }
 
+      // Log successful token verification (app access)
+      await logAudit(
+        payload.sub, 'TOKEN_VERIFY',
+        { app_code: app_code || null, role: app_code ? payload.apps[app_code] : null },
+        req.ip || 'unknown', req.headers['user-agent'] || ''
+      );
+
       res.json({
         success: true,
         data: {
@@ -112,7 +120,7 @@ export class AuthController {
 
       logger.info(`User logged out: ${req.user.email}`);
 
-      await logAudit(req.user.sub, 'LOGOUT', {}, req.ip || 'unknown');
+      await logAudit(req.user.sub, 'LOGOUT', {}, req.ip || 'unknown', req.headers['user-agent'] || '');
 
       res.json({ success: true, message: 'Logged out successfully' });
     } catch (error: unknown) {
@@ -142,6 +150,28 @@ export class AuthController {
       });
     } catch (error: unknown) {
       res.status(500).json({ success: false, error: 'Failed to get user info' });
+    }
+  }
+
+  // POST /api/auth/log-app-open - Log when user clicks to open an app from dashboard
+  static async logAppOpen(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ success: false, error: 'Not authenticated' });
+      }
+
+      const { app_code, app_url } = req.body;
+
+      await logAudit(
+        req.user.sub, 'APP_OPEN',
+        { app_code: app_code || null, app_url: app_url || null },
+        req.ip || 'unknown', req.headers['user-agent'] || ''
+      );
+
+      res.json({ success: true });
+    } catch (error: unknown) {
+      logger.error('Log app open error:', error);
+      res.json({ success: true }); // don't block navigation on log failure
     }
   }
 
