@@ -62,3 +62,26 @@ export const userAppParamSchema = z.object({
 export const appCodeParamSchema = z.object({
   appCode: z.string().min(1, 'Invalid app code'),
 }).strict();
+
+// ============================================
+// FUNDMATE SCHEMAS
+// ============================================
+
+export const fundmateHistorySchema = z.object({
+  company: z.string().max(255).optional(),
+  country: z.string().min(1).max(5),
+  month: z.string().min(1).max(20),
+  year: z.number().int().min(2020).max(2035),
+  currency: z.string().min(1).max(10),
+  maxPct: z.number().min(0).max(100).optional(),
+  supportPct: z.number().min(0).max(100).optional(),
+  rate: z.number().min(0).optional(),
+  totalSales: z.number().optional(),
+  orderFees: z.number().optional(),
+  refundFees: z.number().optional(),
+  storageFees: z.number().optional(),
+  totalFees: z.number().optional(),
+  eligibleAmount: z.number().optional(),
+  supportAmount: z.number().optional(),
+  supportAmountTRY: z.number().optional(),
+}).strict();

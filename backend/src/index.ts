@@ -12,6 +12,7 @@ import appsRoutes from './routes/apps.routes';
 import adminRoutes from './routes/admin.routes';
 import secretsRoutes from './routes/secrets.routes';
 import internalRoutes from './routes/internal.routes';
+import fundmateRoutes from './routes/fundmate.routes';
 import { loadSecrets, getSecret } from './services/secretsService';
 
 dotenv.config();
@@ -108,6 +109,7 @@ app.use('/api/apps', appsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin', secretsRoutes);
 app.use('/api/internal', internalRoutes);
+app.use('/api/fundmate', fundmateRoutes);
 
 // Error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
