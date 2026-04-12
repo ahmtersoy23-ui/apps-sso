@@ -8,32 +8,32 @@ import {
 } from './dashboard-helpers';
 
 describe('getRoleBadgeStyle', () => {
-  it('returns red/pink gradient for admin role', () => {
+  it('returns indigo style for admin role', () => {
     const style = getRoleBadgeStyle('admin');
-    expect(style).toContain('from-red-500');
-    expect(style).toContain('to-pink-500');
+    expect(style).toContain('bg-indigo-500/15');
+    expect(style).toContain('text-indigo-300');
   });
 
-  it('returns blue/cyan gradient for editor role', () => {
+  it('returns sky style for editor role', () => {
     const style = getRoleBadgeStyle('editor');
-    expect(style).toContain('from-blue-500');
-    expect(style).toContain('to-cyan-500');
+    expect(style).toContain('bg-sky-500/15');
+    expect(style).toContain('text-sky-300');
   });
 
-  it('returns gray gradient for viewer role', () => {
+  it('returns slate style for viewer role', () => {
     const style = getRoleBadgeStyle('viewer');
-    expect(style).toContain('from-gray-400');
-    expect(style).toContain('to-gray-500');
+    expect(style).toContain('bg-slate-500/15');
+    expect(style).toContain('text-slate-400');
   });
 
-  it('returns gray gradient for undefined role', () => {
+  it('returns slate style for undefined role', () => {
     const style = getRoleBadgeStyle(undefined);
-    expect(style).toContain('from-gray-400');
+    expect(style).toContain('bg-slate-500/15');
   });
 
-  it('returns gray gradient for unknown role', () => {
+  it('returns slate style for unknown role', () => {
     const style = getRoleBadgeStyle('superadmin');
-    expect(style).toContain('from-gray-400');
+    expect(style).toContain('bg-slate-500/15');
   });
 });
 
