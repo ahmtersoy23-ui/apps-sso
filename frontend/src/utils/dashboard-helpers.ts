@@ -3,13 +3,13 @@
 export const getRoleBadgeStyle = (roleCode?: string): string => {
   switch (roleCode) {
     case 'admin':
-      return 'bg-gradient-to-r from-red-500 to-pink-500 text-white';
+      return 'bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30';
     case 'editor':
-      return 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white';
+      return 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30';
     case 'viewer':
-      return 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
+      return 'bg-slate-500/15 text-slate-400 ring-1 ring-slate-500/30';
     default:
-      return 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
+      return 'bg-slate-500/15 text-slate-400 ring-1 ring-slate-500/30';
   }
 };
 

@@ -112,14 +112,14 @@ export default function DashboardPage() {
     <div
       key={app.app_id}
       onClick={() => openApp(app.app_code, app.app_url)}
-      className="group relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden hover:transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 w-full aspect-square flex flex-col cursor-pointer"
+      className="group relative bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-indigo-500/30 transition-all duration-300 overflow-hidden hover:shadow-lg hover:shadow-indigo-950/30 w-full aspect-square flex flex-col cursor-pointer"
     >
-      <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-300" style={{backgroundImage: `linear-gradient(to bottom right, rgb(168 85 247), rgb(236 72 153))`}}></div>
+      <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
       <div className="p-5 h-full flex flex-col justify-center">
         <div className="flex flex-col items-center flex-1 justify-center">
           <div className="flex items-center justify-center" style={{ marginBottom: '1.5rem' }}>
-            <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 p-4`}>
+            <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 p-4`}>
               {getAppIcon(app.app_code) ? (
                 <img
                   src={getAppIcon(app.app_code)!}
@@ -127,7 +127,7 @@ export default function DashboardPage() {
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <span className="text-purple-600 text-3xl font-bold">
+                <span className="text-indigo-600 text-3xl font-bold">
                   {app.app_name.charAt(0)}
                 </span>
               )}
@@ -139,25 +139,25 @@ export default function DashboardPage() {
               <span
                 className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
                   app.role_code
-                )} shadow-lg`}
+                )}`}
               >
                 {app.role_name}
               </span>
             </div>
           )}
 
-          <h3 className="text-lg font-bold text-white mb-3 text-center group-hover:text-purple-300 transition-colors">
+          <h3 className="text-lg font-bold text-white mb-3 text-center group-hover:text-indigo-300 transition-colors">
             {getAppDisplayName(app.app_name, app.app_code)}
           </h3>
 
-          <p className="text-sm text-purple-300 text-center leading-relaxed min-h-[2.5rem]">
+          <p className="text-sm text-slate-400 text-center leading-relaxed min-h-[2.5rem]">
             {app.app_description}
           </p>
         </div>
 
         <button
           onClick={() => openApp(app.app_code, app.app_url)}
-          className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-purple-500/50 group-hover:shadow-purple-500/70"
+          className="w-full inline-flex justify-center items-center px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-xl font-semibold transition-all duration-200"
         >
           {isToolCard ? 'Open Tool' : 'Open Application'}
           <svg
@@ -180,9 +180,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500"></div>
           <p className="mt-4 text-white text-lg">Loading your workspace...</p>
         </div>
       </div>
@@ -190,13 +190,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col">
       {/* Header */}
-      <header className="bg-black/20 backdrop-blur-lg border-b border-white/10">
+      <header className="bg-slate-900/80 backdrop-blur-lg border-b border-slate-700/50">
         <div className="px-6 lg:px-12 xl:px-20 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4" style={{ marginLeft: '10px' }}>
-              <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/30 overflow-hidden">
+              <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shadow-md overflow-hidden">
                 <img
                   src="/logo.jpg"
                   alt="IWA Apps"
@@ -205,7 +205,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">IWA Apps</h1>
-                <p className="text-xs text-purple-300">SSO Portal</p>
+                <p className="text-xs text-slate-400">SSO Portal</p>
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export default function DashboardPage() {
               {isAdmin && (
                 <button
                   onClick={() => navigate('/admin')}
-                  className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm rounded-lg font-medium transition-all duration-200 shadow-lg shadow-purple-500/50"
+                  className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg font-medium transition-all duration-200"
                 >
                   <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -224,15 +224,15 @@ export default function DashboardPage() {
               )}
 
               {user && (
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-white/20">
+                <div className="flex items-center gap-2 bg-slate-800/60 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-slate-700/50">
                   {user.picture ? (
                     <img
                       src={user.picture}
                       alt={user.name}
-                      className="h-8 w-8 rounded-full ring-2 ring-purple-500"
+                      className="h-8 w-8 rounded-full ring-2 ring-slate-600"
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center ring-2 ring-purple-500">
+                    <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center ring-2 ring-slate-600">
                       <span className="text-white font-bold text-sm">
                         {user.name.charAt(0).toUpperCase()}
                       </span>
@@ -240,7 +240,7 @@ export default function DashboardPage() {
                   )}
                   <div className="hidden md:block">
                     <p className="text-xs font-semibold text-white leading-tight">{user.name}</p>
-                    <p className="text-[10px] text-purple-300 leading-tight">{user.email}</p>
+                    <p className="text-[10px] text-slate-400 leading-tight">{user.email}</p>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -282,10 +282,10 @@ export default function DashboardPage() {
         )}
 
         {apps.length === 0 ? (
-          <div className="text-center py-16 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 w-full max-w-[1600px]">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-purple-500/20 rounded-full mb-4">
+          <div className="text-center py-16 bg-slate-800/50 rounded-2xl border border-slate-700/50 w-full max-w-[1600px]">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-700/50 rounded-full mb-4">
               <svg
-                className="h-10 w-10 text-purple-400"
+                className="h-10 w-10 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -299,8 +299,8 @@ export default function DashboardPage() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">No applications or tools</h3>
-            <p className="text-purple-300 mb-1">You don't have access to any applications yet.</p>
-            <p className="text-purple-400 text-sm">Contact your administrator for access.</p>
+            <p className="text-slate-300 mb-1">You don't have access to any applications yet.</p>
+            <p className="text-slate-400 text-sm">Contact your administrator for access.</p>
           </div>
         ) : (
           <>
@@ -309,7 +309,7 @@ export default function DashboardPage() {
               <div className="w-full max-w-[1800px] mb-12">
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white mb-1">Your Applications</h2>
-                  <p className="text-sm text-purple-300">Full-featured business applications</p>
+                  <p className="text-sm text-slate-400">Full-featured business applications</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {apps.filter(app => app.app_type !== 'tool').map((app) => renderCard(app, false))}
@@ -322,7 +322,7 @@ export default function DashboardPage() {
               <div className="w-full max-w-[1800px]">
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-white mb-1">Your Tools</h2>
-                  <p className="text-sm text-purple-300">Quick utilities and helpers</p>
+                  <p className="text-sm text-slate-400">Quick utilities and helpers</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {apps.filter(app => app.app_type === 'tool').map((app) => renderCard(app, true))}
@@ -336,7 +336,7 @@ export default function DashboardPage() {
       {/* Footer */}
       <footer className="mt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-purple-400 text-sm">
+          <p className="text-slate-500 text-sm">
             Powered by IWA Apps SSO • Secure Single Sign-On Portal
           </p>
         </div>
