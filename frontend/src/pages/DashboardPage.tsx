@@ -370,10 +370,9 @@ export default function DashboardPage() {
             {/* Tools Section */}
             {apps.filter(app => app.app_type === 'tool').length > 0 && (
               <div className="w-full max-w-[1800px]">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-px flex-1 bg-slate-700/50"></div>
-                  <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Tools</h2>
-                  <div className="h-px flex-1 bg-slate-700/50"></div>
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-1">Your Tools</h2>
+                  <p className="text-sm text-slate-400">Quick utilities and helpers</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {apps.filter(app => app.app_type === 'tool').map((app) => renderToolCard(app))}
