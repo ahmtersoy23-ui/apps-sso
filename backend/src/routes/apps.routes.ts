@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', authenticate, async (_req: AuthRequest, res) => {
   try {
     const result = await query(
-      'SELECT app_id, app_code, app_name, app_description, app_url, app_icon FROM applications WHERE is_active = true ORDER BY app_name'
+      'SELECT app_id, app_code, app_name, app_description, app_url, app_icon, app_type FROM applications WHERE is_active = true ORDER BY app_name'
     );
 
     res.json({
@@ -35,6 +35,7 @@ router.get('/my', authenticate, async (req: AuthRequest, res) => {
         a.app_description,
         a.app_url,
         a.app_icon,
+        a.app_type,
         r.role_code,
         r.role_name,
         r.description as role_description
