@@ -146,17 +146,7 @@ export default function LoginPage() {
 
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-slate-700/50">
-              <p className="text-slate-400 text-xs text-center">
-                By signing in, you agree to our{' '}
-                <a href="#" className="text-slate-300 hover:text-white underline">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-slate-300 hover:text-white underline">
-                  Privacy Policy
-                </a>
-              </p>
-              <p className="text-slate-500 text-sm text-center mt-3">
+              <p className="text-slate-500 text-sm text-center">
                 Authorized users only • Contact admin for access
               </p>
             </div>
