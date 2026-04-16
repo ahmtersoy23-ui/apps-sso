@@ -24,6 +24,8 @@ export const getAppIcon = (appCode: string): string | null => {
     'fundmate': '/icons/fundmate.svg',
     'databridge': '/icons/databridge.svg',
     'adpilot': '/icons/adpilot.svg',
+    'cargolens': '/icons/cargolens.svg',
+    'iwa-agent': '/icons/iwa-agent.svg',
   };
   return icons[appCode.toLowerCase()] || null;
 };

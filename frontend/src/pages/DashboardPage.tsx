@@ -107,8 +107,8 @@ export default function DashboardPage() {
   // Check if user has admin role in any app
   const isAdmin = apps.some(app => app.role_code === 'admin');
 
-  // Render app/tool card
-  const renderCard = (app: Application, isToolCard: boolean = false) => (
+  // Render application card (kare, buyuk)
+  const renderAppCard = (app: Application) => (
     <div
       key={app.app_id}
       onClick={() => openApp(app.app_code, app.app_url)}
@@ -119,7 +119,7 @@ export default function DashboardPage() {
       <div className="p-5 h-full flex flex-col justify-center">
         <div className="flex flex-col items-center flex-1 justify-center">
           <div className="flex items-center justify-center" style={{ marginBottom: '1.5rem' }}>
-            <div className={`h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 p-4`}>
+            <div className="h-20 w-20 bg-white rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 p-4">
               {getAppIcon(app.app_code) ? (
                 <img
                   src={getAppIcon(app.app_code)!}
@@ -134,7 +134,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {!isToolCard && app.role_code && (
+          {app.role_code && (
             <div className="flex justify-center" style={{ marginBottom: '1rem' }}>
               <span
                 className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getRoleBadgeStyle(
@@ -159,7 +159,7 @@ export default function DashboardPage() {
           onClick={() => openApp(app.app_code, app.app_url)}
           className="w-full inline-flex justify-center items-center px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-xl font-semibold transition-all duration-200"
         >
-          {isToolCard ? 'Open Tool' : 'Open Application'}
+          Open Application
           <svg
             className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform"
             fill="none"
@@ -174,6 +174,56 @@ export default function DashboardPage() {
             />
           </svg>
         </button>
+      </div>
+    </div>
+  );
+
+  // Render tool card (yatay, kompakt)
+  const renderToolCard = (app: Application) => (
+    <div
+      key={app.app_id}
+      onClick={() => openApp(app.app_code, app.app_url)}
+      className="group relative bg-slate-800/50 rounded-xl border border-slate-700/50 hover:border-indigo-500/30 transition-all duration-300 overflow-hidden hover:shadow-md hover:shadow-indigo-950/20 cursor-pointer"
+    >
+      <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      <div className="relative p-4 flex items-center gap-4">
+        <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0 p-2">
+          {getAppIcon(app.app_code) ? (
+            <img
+              src={getAppIcon(app.app_code)!}
+              alt={app.app_name}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <span className="text-indigo-600 text-lg font-bold">
+              {app.app_name.charAt(0)}
+            </span>
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
+            {getAppDisplayName(app.app_name, app.app_code)}
+          </h3>
+          <p className="text-xs text-slate-400 truncate">
+            {app.app_description}
+          </p>
+        </div>
+
+        <svg
+          className="h-4 w-4 text-slate-500 group-hover:text-indigo-400 shrink-0 transform group-hover:translate-x-0.5 transition-all"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
       </div>
     </div>
   );
@@ -312,7 +362,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-slate-400">Full-featured business applications</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {apps.filter(app => app.app_type !== 'tool').map((app) => renderCard(app, false))}
+                  {apps.filter(app => app.app_type !== 'tool').map((app) => renderAppCard(app))}
                 </div>
               </div>
             )}
@@ -320,12 +370,13 @@ export default function DashboardPage() {
             {/* Tools Section */}
             {apps.filter(app => app.app_type === 'tool').length > 0 && (
               <div className="w-full max-w-[1800px]">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white mb-1">Your Tools</h2>
-                  <p className="text-sm text-slate-400">Quick utilities and helpers</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-slate-700/50"></div>
+                  <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Tools</h2>
+                  <div className="h-px flex-1 bg-slate-700/50"></div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {apps.filter(app => app.app_type === 'tool').map((app) => renderCard(app, true))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {apps.filter(app => app.app_type === 'tool').map((app) => renderToolCard(app))}
                 </div>
               </div>
             )}
