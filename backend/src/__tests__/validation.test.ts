@@ -145,23 +145,27 @@ describe('createUserSchema', () => {
 // ============================================
 describe('updateUserStatusSchema', () => {
   it('should accept true', () => {
-    expect(updateUserStatusSchema.safeParse({ isActive: true }).success).toBe(true);
+    expect(updateUserStatusSchema.safeParse({ is_active: true }).success).toBe(true);
   });
 
   it('should accept false', () => {
-    expect(updateUserStatusSchema.safeParse({ isActive: false }).success).toBe(true);
+    expect(updateUserStatusSchema.safeParse({ is_active: false }).success).toBe(true);
   });
 
   it('should reject string', () => {
-    expect(updateUserStatusSchema.safeParse({ isActive: 'true' }).success).toBe(false);
+    expect(updateUserStatusSchema.safeParse({ is_active: 'true' }).success).toBe(false);
   });
 
-  it('should reject missing isActive', () => {
+  it('should reject missing is_active', () => {
     expect(updateUserStatusSchema.safeParse({}).success).toBe(false);
   });
 
+  it('should reject camelCase isActive (frontend gonderir, snake_case bekliyoruz)', () => {
+    expect(updateUserStatusSchema.safeParse({ isActive: true }).success).toBe(false);
+  });
+
   it('should reject extra fields (strict)', () => {
-    expect(updateUserStatusSchema.safeParse({ isActive: true, extra: 1 }).success).toBe(false);
+    expect(updateUserStatusSchema.safeParse({ is_active: true, extra: 1 }).success).toBe(false);
   });
 });
 

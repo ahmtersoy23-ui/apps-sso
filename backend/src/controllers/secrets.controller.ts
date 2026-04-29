@@ -11,15 +11,11 @@ const MANAGED_KEYS: ManagedSecretKey[] = ['JWT_SECRET', 'JWT_REFRESH_SECRET'];
 // Apps that use JWT_SECRET and need manual .env update after rotation
 const AFFECTED_APPS = ['PriceLab', 'AmzSellMetrics', 'StockPulse', 'SwiftStock', 'ManuMaestro', 'DataBridge'];
 
-function isAdmin(req: AuthRequest): boolean {
-  return !!req.user?.apps && Object.values(req.user.apps).includes('admin');
-}
+// Auth/role kontrolu route middleware (requireSsoAdmin) tarafindan yapilir.
 
 export class SecretsController {
   // GET /api/admin/secrets — list metadata only (no values)
-  static async listSecrets(req: AuthRequest, res: Response) {
-    if (!isAdmin(req)) return res.status(403).json({ error: 'Admin access required' });
-
+  static async listSecrets(_req: AuthRequest, res: Response) {
     try {
       const result = await pool.query<{
         id: string;
@@ -53,8 +49,6 @@ export class SecretsController {
 
   // POST /api/admin/secrets/:key/rotate — generate new secret, save encrypted, update cache
   static async rotateSecret(req: AuthRequest, res: Response) {
-    if (!isAdmin(req)) return res.status(403).json({ error: 'Admin access required' });
-
     const { key } = req.params;
     if (!MANAGED_KEYS.includes(key as ManagedSecretKey)) {
       return res.status(400).json({ error: `Invalid secret key. Allowed: ${MANAGED_KEYS.join(', ')}` });
@@ -94,8 +88,6 @@ export class SecretsController {
 
   // POST /api/admin/secrets/:key/revert — revert to previous version
   static async revertSecret(req: AuthRequest, res: Response) {
-    if (!isAdmin(req)) return res.status(403).json({ error: 'Admin access required' });
-
     const { key } = req.params;
     if (!MANAGED_KEYS.includes(key as ManagedSecretKey)) {
       return res.status(400).json({ error: `Invalid secret key. Allowed: ${MANAGED_KEYS.join(', ')}` });

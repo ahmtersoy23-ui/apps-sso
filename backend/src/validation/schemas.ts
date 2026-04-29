@@ -30,7 +30,7 @@ export const createUserSchema = z.object({
 }).strict();
 
 export const updateUserStatusSchema = z.object({
-  isActive: z.boolean(),
+  is_active: z.boolean(),
 }).strict();
 
 // ============================================

@@ -4,27 +4,14 @@ import { pool } from '../config/database';
 import { logger } from '../config/logger';
 import { logAudit } from '../utils/auditLog';
 
-// UUID v4 validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-// Basic email validation
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function isValidUUID(value: string): boolean {
-  return UUID_REGEX.test(value);
-}
-
-function isAdmin(req: AuthRequest): boolean {
-  return !!req.user?.apps && Object.values(req.user.apps).includes('admin');
-}
+// Auth/role kontrolu route middleware (requireSsoAdmin) tarafindan yapilir.
+// Validation Zod schema (validation/schemas.ts) tarafindan yapilir.
+// Bu controller bu garantilere guvenir; tekrar kontrol etmez.
 
 export class AdminController {
   // GET /api/admin/users - Get all users
-  static async getUsers(req: AuthRequest, res: Response) {
+  static async getUsers(_req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const result = await pool.query(`
         SELECT
           u.user_id,
@@ -67,19 +54,8 @@ export class AdminController {
   // PATCH /api/admin/users/:userId/status - Toggle user active status
   static async toggleUserStatus(req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const { userId } = req.params;
-      if (!isValidUUID(userId)) {
-        return res.status(400).json({ error: 'Invalid user ID format' });
-      }
-
       const { is_active } = req.body;
-      if (typeof is_active !== 'boolean') {
-        return res.status(400).json({ error: 'is_active must be a boolean' });
-      }
 
       await pool.query(
         'UPDATE users SET is_active = $1 WHERE user_id = $2',
@@ -102,16 +78,8 @@ export class AdminController {
   // POST /api/admin/users/:userId/apps - Assign app role to user
   static async assignAppRole(req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const { userId } = req.params;
       const { app_id, role_id } = req.body;
-
-      if (!isValidUUID(userId) || !isValidUUID(app_id) || !isValidUUID(role_id)) {
-        return res.status(400).json({ error: 'Invalid ID format' });
-      }
 
       // Check if assignment already exists
       const existing = await pool.query(
@@ -147,15 +115,7 @@ export class AdminController {
   // DELETE /api/admin/users/:userId/apps/:appId - Remove app access
   static async removeAppAccess(req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const { userId, appId } = req.params;
-
-      if (!isValidUUID(userId) || !isValidUUID(appId)) {
-        return res.status(400).json({ error: 'Invalid ID format' });
-      }
 
       await pool.query(
         'DELETE FROM user_app_roles WHERE user_id = $1 AND app_id = $2',
@@ -178,14 +138,7 @@ export class AdminController {
   // DELETE /api/admin/users/:userId - Delete user permanently
   static async deleteUser(req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const { userId } = req.params;
-      if (!isValidUUID(userId)) {
-        return res.status(400).json({ error: 'Invalid user ID format' });
-      }
 
       // Prevent self-deletion
       if (userId === req.user!.sub) {
@@ -220,12 +173,8 @@ export class AdminController {
   }
 
   // GET /api/admin/applications - Get all applications
-  static async getApplications(req: AuthRequest, res: Response) {
+  static async getApplications(_req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const result = await pool.query(`
         SELECT
           a.app_id,
@@ -252,12 +201,8 @@ export class AdminController {
   }
 
   // GET /api/admin/roles - Get all roles
-  static async getRoles(req: AuthRequest, res: Response) {
+  static async getRoles(_req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const result = await pool.query('SELECT * FROM roles ORDER BY role_name');
 
       res.json({
@@ -273,18 +218,7 @@ export class AdminController {
   // POST /api/admin/users - Create new user manually
   static async createUser(req: AuthRequest, res: Response) {
     try {
-      if (!isAdmin(req)) {
-        return res.status(403).json({ error: 'Admin access required' });
-      }
-
       const { email, name } = req.body;
-
-      if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email)) {
-        return res.status(400).json({ error: 'Valid email is required' });
-      }
-      if (!name || typeof name !== 'string' || name.trim().length < 2 || name.length > 255) {
-        return res.status(400).json({ error: 'Name must be between 2 and 255 characters' });
-      }
 
       // Check if user already exists
       const existing = await pool.query(

@@ -15,9 +15,11 @@ export const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
+// Pool 'error' event'i idle client'larda (transient network/PG restart vb.) tetiklenir.
+// Eskiden process.exit(-1) cagriliyordu — tek transient error 8 app'i etkileyen SSO downtime'ina
+// yol aciyordu. Pool kendi kendine recover eder; bir sonraki query yeni connection acar.
 pool.on('error', (err) => {
-  logger.error('Database pool error:', err.message);
-  process.exit(-1);
+  logger.error('Database pool idle client error (recoverable):', err.message);
 });
 
 export const query = async (text: string, params?: (string | number | boolean | null | object)[]) => {

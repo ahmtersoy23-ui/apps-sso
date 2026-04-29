@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AdminController } from '../controllers/admin.controller';
-import { authenticate, requireRole } from '../middleware/auth.middleware';
+import { authenticate, requireSsoAdmin } from '../middleware/auth.middleware';
 import { validateBody, validateParams } from '../middleware/validate';
 import {
   createUserSchema,
@@ -12,9 +12,9 @@ import {
 
 const router = Router();
 
-// All admin routes require authentication + admin role
+// All admin routes require authentication + SSO admin role
 router.use(authenticate);
-router.use(requireRole(['admin']));
+router.use(requireSsoAdmin);
 
 // Users management
 router.get('/users', AdminController.getUsers);

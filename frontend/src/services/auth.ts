@@ -78,6 +78,17 @@ class AuthService {
     return !this.isTokenExpired(token);
   }
 
+  // Backend `requireSsoAdmin` middleware ile ayni mantik (auth.middleware.ts).
+  // Migration 005 uygulandiktan sonra `apps['apps-sso']==='admin'` birincil yol;
+  // o ana kadar email hardgate calisir.
+  isSsoAdmin(): boolean {
+    const user = this.getUser();
+    if (!user) return false;
+    if (user.apps?.['apps-sso'] === 'admin') return true;
+    const SUPER_ADMIN_EMAILS = ['ersoy@iwaconcept.com.tr', 'huseyin@iwaconcept.com.tr'];
+    return SUPER_ADMIN_EMAILS.includes(user.email);
+  }
+
   logout(): void {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
