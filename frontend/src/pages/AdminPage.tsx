@@ -150,8 +150,8 @@ export default function AdminPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+        <div className="text-center" role="status" aria-live="polite">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500" aria-hidden="true"></div>
           <p className="mt-4 text-white text-lg">Loading...</p>
         </div>
       </div>
@@ -191,10 +191,12 @@ export default function AdminPage() {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <button
+                type="button"
                 onClick={() => navigate('/dashboard')}
+                aria-label="Back to dashboard"
                 className="h-12 w-12 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors border border-white/20"
               >
-                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
@@ -237,7 +239,7 @@ export default function AdminPage() {
             className="mb-6 flex items-center justify-between gap-4 bg-red-500/10 border border-red-500/30 text-red-200 rounded-xl px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <svg className="h-5 w-5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg aria-hidden="true" focusable="false" className="h-5 w-5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <p className="text-sm">
@@ -256,7 +258,7 @@ export default function AdminPage() {
         {/* Tabs */}
         <div className="mb-8">
           <div className="border-b border-white/10">
-            <nav className="flex space-x-8">
+            <nav className="flex space-x-8" aria-label="Admin sections">
               <button
                 onClick={() => setActiveTab('users')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${

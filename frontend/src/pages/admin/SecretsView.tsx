@@ -97,8 +97,8 @@ export default function SecretsView() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="flex items-center justify-center py-12" role="status" aria-live="polite">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500" aria-hidden="true"></div>
         <span className="ml-3 text-purple-300">Loading secrets...</span>
       </div>
     );
@@ -125,10 +125,15 @@ export default function SecretsView() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center justify-between">
+        <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-center justify-between">
           <span className="text-red-300 text-sm">{error}</span>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-200">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            aria-label="Dismiss error message"
+            className="text-red-400 hover:text-red-200"
+          >
+            <svg aria-hidden="true" focusable="false" className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -193,16 +198,21 @@ export default function SecretsView() {
 
       {/* Rotate Confirm Modal */}
       {confirmKey && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rotate-confirm-title"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        >
           <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 max-w-md w-full">
             <div className="flex items-center space-x-3 mb-4">
               <div className="h-10 w-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" focusable="false" className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-white font-bold">Secret Rotate Et</h3>
+                <h3 id="rotate-confirm-title" className="text-white font-bold">Secret Rotate Et</h3>
                 <p className="text-slate-400 text-sm">{confirmKey}</p>
               </div>
             </div>

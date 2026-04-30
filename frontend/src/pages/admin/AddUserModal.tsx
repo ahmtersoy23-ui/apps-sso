@@ -8,18 +8,26 @@ export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalPr
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-user-modal-title"
+      aria-describedby="add-user-modal-description"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
       <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-2xl border border-white/10 max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white">Add New User</h3>
-            <p className="text-purple-300 text-sm mt-1">Create a new user account manually</p>
+            <h3 id="add-user-modal-title" className="text-xl font-bold text-white">Add New User</h3>
+            <p id="add-user-modal-description" className="text-purple-300 text-sm mt-1">Create a new user account manually</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close add user dialog"
             className="text-purple-400 hover:text-white transition-colors"
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" focusable="false" className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -42,10 +50,11 @@ export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalPr
           className="space-y-4"
         >
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">
+            <label htmlFor="add-user-email" className="block text-sm font-medium text-purple-300 mb-2">
               Email Address *
             </label>
             <input
+              id="add-user-email"
               type="email"
               name="email"
               required
@@ -55,10 +64,11 @@ export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">
+            <label htmlFor="add-user-name" className="block text-sm font-medium text-purple-300 mb-2">
               Full Name *
             </label>
             <input
+              id="add-user-name"
               type="text"
               name="name"
               required
@@ -69,7 +79,7 @@ export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalPr
 
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <div className="flex items-start">
-              <svg className="h-5 w-5 text-blue-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg aria-hidden="true" focusable="false" className="h-5 w-5 text-blue-400 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>

@@ -20,18 +20,26 @@ export default function AssignRoleModal({
   if (!show || !selectedUser) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="assign-role-modal-title"
+      aria-describedby="assign-role-modal-description"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
       <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-2xl border border-white/10 max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white">Assign Application</h3>
-            <p className="text-purple-300 text-sm mt-1">Assign {selectedUser.name} to an application</p>
+            <h3 id="assign-role-modal-title" className="text-xl font-bold text-white">Assign Application</h3>
+            <p id="assign-role-modal-description" className="text-purple-300 text-sm mt-1">Assign {selectedUser.name} to an application</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close assign application dialog"
             className="text-purple-400 hover:text-white transition-colors"
           >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" focusable="false" className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -53,10 +61,11 @@ export default function AssignRoleModal({
           className="space-y-4"
         >
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">
+            <label htmlFor="assign-role-app" className="block text-sm font-medium text-purple-300 mb-2">
               Application
             </label>
             <select
+              id="assign-role-app"
               name="app_id"
               required
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -71,10 +80,11 @@ export default function AssignRoleModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">
+            <label htmlFor="assign-role-role" className="block text-sm font-medium text-purple-300 mb-2">
               Role
             </label>
             <select
+              id="assign-role-role"
               name="role_id"
               required
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"

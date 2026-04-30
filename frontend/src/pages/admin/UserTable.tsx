@@ -43,17 +43,20 @@ export default function UserTable({
 
       {/* Search bar */}
       <div className="mb-6">
+        <label htmlFor="user-search" className="sr-only">Search users</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" focusable="false" className="h-5 w-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input
+            id="user-search"
             type="text"
             placeholder="Search users by name or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search users by name or email"
             className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
@@ -128,10 +131,12 @@ export default function UserTable({
                             {app.role_name}
                           </span>
                           <button
+                            type="button"
                             onClick={() => removeAppAccess(u.user_id, app.app_id)}
+                            aria-label={`Remove ${app.app_name} access from ${u.name}`}
                             className="ml-2 text-red-400 hover:text-red-300 transition-colors"
                           >
-                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg aria-hidden="true" focusable="false" className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
@@ -159,11 +164,13 @@ export default function UserTable({
                 </td>
                 <td className="py-4 px-4">
                   <button
+                    type="button"
                     onClick={() => deleteUser(u.user_id, u.email)}
                     className="text-red-400 hover:text-red-300 transition-colors"
                     title="Delete user"
+                    aria-label={`Delete user ${u.email}`}
                   >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" focusable="false" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
