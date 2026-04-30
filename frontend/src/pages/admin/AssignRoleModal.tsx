@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { AdminUser, AdminApplication, Role } from '../../types';
 
 interface AssignRoleModalProps {
@@ -17,7 +18,27 @@ export default function AssignRoleModal({
   roles,
   onSubmit,
 }: AssignRoleModalProps) {
-  if (!show || !selectedUser) return null;
+  const firstFieldRef = useRef<HTMLSelectElement>(null);
+  const isOpen = show && !!selectedUser;
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    firstFieldRef.current?.focus();
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -65,6 +86,7 @@ export default function AssignRoleModal({
               Application
             </label>
             <select
+              ref={firstFieldRef}
               id="assign-role-app"
               name="app_id"
               required

@@ -232,7 +232,7 @@ export default function AdminPage() {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 lg:px-12 xl:px-20 py-8">
+      <main id="main-content" className="px-6 lg:px-12 xl:px-20 py-8">
         {loadErrors.length > 0 && (
           <div
             role="alert"

@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 interface AddUserModalProps {
   show: boolean;
   onClose: () => void;
@@ -5,6 +7,25 @@ interface AddUserModalProps {
 }
 
 export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalProps) {
+  const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!show) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    firstFieldRef.current?.focus();
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [show, onClose]);
+
   if (!show) return null;
 
   return (
@@ -54,6 +75,7 @@ export default function AddUserModal({ show, onClose, onSubmit }: AddUserModalPr
               Email Address *
             </label>
             <input
+              ref={firstFieldRef}
               id="add-user-email"
               type="email"
               name="email"
