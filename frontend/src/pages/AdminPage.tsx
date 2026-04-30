@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [loadErrors, setLoadErrors] = useState<string[]>([]);
   const user = authService.getUser();
 
   useEffect(() => {
@@ -31,14 +32,19 @@ export default function AdminPage() {
     loadRoles();
   }, []);
 
+  const recordLoadError = (label: string, err: unknown) => {
+    console.error(`[AdminPage] ${label} load failed`, err);
+    setLoadErrors((prev) => (prev.includes(label) ? prev : [...prev, label]));
+  };
+
   const loadApps = async () => {
     try {
       const response = await apiService.getMyApps();
       if (response.success) {
         setApps(response.data);
       }
-    } catch {
-      // silently handled
+    } catch (err) {
+      recordLoadError('Apps', err);
     } finally {
       setLoading(false);
     }
@@ -50,8 +56,8 @@ export default function AdminPage() {
       if (response.success) {
         setUsers(response.data);
       }
-    } catch {
-      // silently handled
+    } catch (err) {
+      recordLoadError('Users', err);
     }
   };
 
@@ -61,8 +67,8 @@ export default function AdminPage() {
       if (response.success) {
         setApplications(response.data);
       }
-    } catch {
-      // silently handled
+    } catch (err) {
+      recordLoadError('Applications', err);
     }
   };
 
@@ -72,9 +78,18 @@ export default function AdminPage() {
       if (response.success) {
         setRoles(response.data);
       }
-    } catch {
-      // silently handled
+    } catch (err) {
+      recordLoadError('Roles', err);
     }
+  };
+
+  const retryLoadAll = () => {
+    setLoadErrors([]);
+    setLoading(true);
+    loadApps();
+    loadUsers();
+    loadApplications();
+    loadRoles();
   };
 
   const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
@@ -216,6 +231,28 @@ export default function AdminPage() {
 
       {/* Main Content */}
       <main className="px-6 lg:px-12 xl:px-20 py-8">
+        {loadErrors.length > 0 && (
+          <div
+            role="alert"
+            className="mb-6 flex items-center justify-between gap-4 bg-red-500/10 border border-red-500/30 text-red-200 rounded-xl px-4 py-3"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="h-5 w-5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-sm">
+                Yüklenemeyen veriler: <span className="font-semibold">{loadErrors.join(', ')}</span>
+              </p>
+            </div>
+            <button
+              onClick={retryLoadAll}
+              className="text-xs px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 rounded-md font-medium"
+            >
+              Tekrar dene
+            </button>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="mb-8">
           <div className="border-b border-white/10">
