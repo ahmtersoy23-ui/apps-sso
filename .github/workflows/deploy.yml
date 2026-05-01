@@ -121,4 +121,4 @@ jobs:
           script: |
             cd /var/www/apps-sso/backend
             npm ci --omit=dev
-            pm2 restart apps-sso-backend
+            sudo -u iwaapps -H PM2_HOME=/home/iwaapps/.pm2 pm2 restart apps-sso-backend
